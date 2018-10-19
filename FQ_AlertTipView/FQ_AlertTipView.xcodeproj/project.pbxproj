@@ -15,7 +15,6 @@
 		9C8BA2C1213E221F00971F02 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8BA2C0213E221F00971F02 /* main.m */; };
 		9C8BA2CB213E221F00971F02 /* FQ_AlertTipViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8BA2CA213E221F00971F02 /* FQ_AlertTipViewTests.m */; };
 		9C8BA2D6213E221F00971F02 /* FQ_AlertTipViewUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8BA2D5213E221F00971F02 /* FQ_AlertTipViewUITests.m */; };
-		9C8BA2E6213E222F00971F02 /* FQ_AlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8BA2E5213E222F00971F02 /* FQ_AlertView.m */; };
 		A780D12D982AE98E922B3563 /* libPods-FQ_AlertTipView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98B9885C0F9147F4606A6332 /* libPods-FQ_AlertTipView.a */; };
 /* End PBXBuildFile section */
 
@@ -55,8 +54,6 @@
 		9C8BA2D1213E221F00971F02 /* FQ_AlertTipViewUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FQ_AlertTipViewUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C8BA2D5213E221F00971F02 /* FQ_AlertTipViewUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FQ_AlertTipViewUITests.m; sourceTree = "<group>"; };
 		9C8BA2D7213E221F00971F02 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9C8BA2E4213E222F00971F02 /* FQ_AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FQ_AlertView.h; sourceTree = "<group>"; };
-		9C8BA2E5213E222F00971F02 /* FQ_AlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FQ_AlertView.m; sourceTree = "<group>"; };
 		ACC5200AA2C5DABA75EDB890 /* Pods-FQ_AlertTipView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FQ_AlertTipView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FQ_AlertTipView/Pods-FQ_AlertTipView.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -128,7 +125,6 @@
 		9C8BA2B0213E221900971F02 /* FQ_AlertTipView */ = {
 			isa = PBXGroup;
 			children = (
-				9C8BA2E3213E222F00971F02 /* FQ_AlertView */,
 				9C8BA2B1213E221900971F02 /* AppDelegate.h */,
 				9C8BA2B2213E221900971F02 /* AppDelegate.m */,
 				9C8BA2B4213E221900971F02 /* ViewController.h */,
@@ -158,16 +154,6 @@
 				9C8BA2D7213E221F00971F02 /* Info.plist */,
 			);
 			path = FQ_AlertTipViewUITests;
-			sourceTree = "<group>";
-		};
-		9C8BA2E3213E222F00971F02 /* FQ_AlertView */ = {
-			isa = PBXGroup;
-			children = (
-				9C8BA2E4213E222F00971F02 /* FQ_AlertView.h */,
-				9C8BA2E5213E222F00971F02 /* FQ_AlertView.m */,
-			);
-			name = FQ_AlertView;
-			path = ../../FQ_AlertView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -324,7 +310,6 @@
 			files = (
 				9C8BA2B6213E221900971F02 /* ViewController.m in Sources */,
 				9C8BA2C1213E221F00971F02 /* main.m in Sources */,
-				9C8BA2E6213E222F00971F02 /* FQ_AlertView.m in Sources */,
 				9C8BA2B3213E221900971F02 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -505,7 +490,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "-34.FQ-AlertTipView";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -524,7 +509,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "-34.FQ-AlertTipView";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
