@@ -23,7 +23,6 @@
 #define TitleFontSize 18
 #define ContentFontSize 14
 #define AlertViewW MIN(SJScreenH,SJScreenW)
-#define ActionBtnH 44
 #define ConfirmTextColor [UIColor colorWithRed:0.0 green:0.5 blue:1.0 alpha:1.0] //Color(0)
 #define DefaultTextColor [UIColor colorWithRed:0.0 green:0.5 blue:1.0 alpha:1.0]// Color(128)
 #define CancelTextColor [UIColor colorWithRed:0.0 green:0.5 blue:1.0 alpha:1.0]//RGBA(1.0,104.0,204.0,1.0)
@@ -36,8 +35,9 @@
 #define BackViewBackgroundColor   [[UIColor whiteColor] colorWithAlphaComponent:1.0]
 
 #define TipCornerRadius 12
-//顶部提示框
 #define TipTopBtnH  36
+#define ActionBtnH 44
+#define SheetActionBtnH 56
 //中间提示框
 #define MidAlertViewWidth 280
 //按钮Tag

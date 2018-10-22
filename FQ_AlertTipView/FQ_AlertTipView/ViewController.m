@@ -75,6 +75,10 @@
                      @{@"底部显示Type-TextWH":@"icon_flash"},
                      @{@"自定义View1":@"icon_calc"},
                      @{@"自定义View2":@"icon_calc"},
+                     @{@"自定义底部View1":@"icon_calc"},
+                     @{@"自定义底部View2":@"icon_calc"},
+                     @{@"自定义底部View3":@"icon_calc"},
+                     @{@"自定义底部View4":@"icon_calc"},
                      ];
     }
     return _dataArr;
@@ -101,7 +105,7 @@
     tableviewCell.imageView.image = [UIImage imageNamed:dict.allValues.firstObject];
     tableviewCell.textLabel.textColor = [UIColor whiteColor];
     tableviewCell.accessoryType   =  UITableViewCellAccessoryDisclosureIndicator;
-    tableviewCell.backgroundColor = [UIColor blackColor];
+    tableviewCell.backgroundColor = [UIColor redColor];
     tableviewCell.textLabel.font = RegularFont(18);
     
     return tableviewCell;
@@ -168,7 +172,7 @@
     }else if(indexPath.row == 6){
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
         alertConfiguration.actionBtnType = FQ_AlertActionButtonType_TextWH;
-        [FQ_AlertView showAlertViewWithTitle:nil  message:@"取消关注以后!您将再也收不到该用户的所有动态?取消关注以后!您将再也收不到该用户的所有动态?"  alertType:FQ_AlertTypeActionSheet confirmActionStr:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到,范士大夫,电视剧啊" otherActionStrArr:nil destructiveActionStr:@"从手机相册选择了盛大交付了" cancelActionStr:@"取消发生发发呆时" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        [FQ_AlertView showAlertViewWithTitle:@"可以的"  message:nil  alertType:FQ_AlertTypeActionSheet confirmActionStr:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到,范士大夫,电视剧啊" otherActionStrArr:nil destructiveActionStr:@"从手机相册选择了盛大交付了" cancelActionStr:@"取消发生发发呆时" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
             NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
         }];
     }else if(indexPath.row == 7){
@@ -184,7 +188,7 @@
         [FQ_AlertView showAlertViewWithTitle:@"提示"  message:@"正在加载中!请稍等!中断需要重新上传!"  alertType:FQ_AlertTypeActionAlert confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:@"中断" cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
             NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
         }];
-    }else{
+    }else if(indexPath.row == 8){
         UIActivityIndicatorView * progressView = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
         progressView.color = [UIColor redColor];
         progressView.frame = CGRectMake(0, 0, 60, 60);
@@ -194,6 +198,30 @@
         alertConfiguration.isClickClear = NO;
         alertConfiguration.customView = progressView;
         [FQ_AlertView showAlertViewWithTitle:@"正在加载" message:nil alertType:FQ_AlertTypeActionAlert confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:@"取消" configuration:alertConfiguration actionBlock:nil];
+    }else if(indexPath.row == 9){
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.actionBtnType = FQ_AlertActionButtonType_FixedWH_FitWidth;
+        [FQ_AlertView showAlertViewWithTitle:nil  message:nil alertType:FQ_AlertTypeActionSheet confirmActionStr:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到,范士大夫,电视剧啊" otherActionStrArr:nil destructiveActionStr:@"从手机相册选择了盛大交付了" cancelActionStr:@"取消发生发发呆时" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+            NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
+        }];
+    }else if(indexPath.row == 10){
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.actionBtnType = FQ_AlertActionButtonType_FixedWH_None;
+        [FQ_AlertView showAlertViewWithTitle:@"可以的"  message:nil  alertType:FQ_AlertTypeActionSheet confirmActionStr:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到,范士大夫,电视剧啊" otherActionStrArr:nil destructiveActionStr:@"从手机相册选择了盛大交付了" cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+            NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
+        }];
+    }else if(indexPath.row == 11){
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.actionBtnType = FQ_AlertActionButtonType_TextWH;
+        [FQ_AlertView showAlertViewWithTitle:nil  message:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到asflksjaflsjaflkasj,范士大夫,电视剧啊"  alertType:FQ_AlertTypeActionSheet confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:@"取消发生发发呆时" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+            NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
+        }];
+    }else{
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.actionBtnType = FQ_AlertActionButtonType_TextWH;
+        [FQ_AlertView showAlertViewWithTitle:nil  message:nil  alertType:FQ_AlertTypeActionSheet confirmActionStr:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到,范士大夫,电视剧啊" otherActionStrArr:nil destructiveActionStr:@"从手机相册选择了盛大交付了" cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+            NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
+        }];
     }
 
 }
