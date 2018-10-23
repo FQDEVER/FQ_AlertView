@@ -55,7 +55,6 @@ typedef NS_ENUM (NSInteger, FQ_AlertType)
 {
     FQ_AlertTypeActionAlert = 0 ,  //中间
     FQ_AlertTypeActionTop ,        //顶部
-    FQ_AlertTypeActionTop_NoneCover ,//顶部无遮罩的情况
     FQ_AlertTypeActionSheet,       //底部
 };
 
@@ -69,12 +68,19 @@ typedef NS_ENUM (NSInteger, FQ_AlertActionType)
 };
 
 
-//-------------------按钮样式----------------------
+//-------------------按钮文本显示样式----------------------
+typedef NS_ENUM (NSInteger, FQ_AlertActionButtonTextType)
+{
+    FQ_AlertActionButtonTextType_FixedWH_FitWidth = 0, //自适应样式.即宽高固定.文字大小随着指定的宽度缩小
+    FQ_AlertActionButtonTextType_FixedWH_None, //默认样式,即宽高固定,文字大小固定.内容中间...展示
+    FQ_AlertActionButtonTextType_TextWH,     //根据文本大小设定按钮的宽高.固定字体大小.全部展示文本
+};
+
+//-------------------按钮显示样式----------------------
 typedef NS_ENUM (NSInteger, FQ_AlertActionButtonType)
 {
-    FQ_AlertActionButtonType_FixedWH_FitWidth = 0, //自适应样式.即宽高固定.文字大小随着指定的宽度缩小
-    FQ_AlertActionButtonType_FixedWH_None, //默认样式,即宽高固定,文字大小固定.内容中间...展示
-    FQ_AlertActionButtonType_TextWH,     //根据文本大小设定按钮的宽高.固定字体大小.全部展示文本
+    FQ_AlertActionButtonType_Default = 0, //默认样式-填充满
+    FQ_AlertActionButtonType_CornerRadius, //圆角样式 - 只针对两个按钮且FQ_AlertTypeActionAlert样式时有效
 };
 
 
@@ -125,9 +131,14 @@ typedef NS_ENUM (NSInteger, FQ_AlertActionButtonType)
 @property (nonatomic, strong) UIColor *coverBackgroundColor;
 
 /**
- //自定义的View.需要传入其Size
+ //自定义ContentView.需要传入其Size.默认宽度为AlertW - 2 * FQAlertPaddingW.
  */
 @property (nonatomic, strong) UIView *customView;
+
+/**
+ //自定义HeaderView.需要传入其Size.默认宽度为AlertW - 2 * FQAlertPaddingW.
+ */
+@property (nonatomic, strong) UIView *headerView;
 
 /**
  //messageStr的对齐方式
@@ -165,7 +176,12 @@ typedef NS_ENUM (NSInteger, FQ_AlertActionButtonType)
 @property (nonatomic, strong) UIFont *alertTipCancelFont;
 
 /**
- 按钮展示的样式.默认为FQ_AlertActionButtonType_FixedWH_FitWidth
+ 按钮文本展示的样式.默认为FQ_AlertActionButtonTextType_FixedWH_FitWidth
+ */
+@property (nonatomic, assign) FQ_AlertActionButtonTextType actionBtnTextType;
+
+/**
+ 按钮样式.默认为填充满.
  */
 @property (nonatomic, assign) FQ_AlertActionButtonType actionBtnType;
 
@@ -173,6 +189,20 @@ typedef NS_ENUM (NSInteger, FQ_AlertActionButtonType)
  是否需要背景控件 - 暂放在这里.默认为YES
  */
 @property (nonatomic, assign) BOOL isNeedCoverBackView;
+
+/**
+ 分割线的宽或高
+ */
+@property (nonatomic, assign) CGFloat separatorPadding;
+
+/**
+ 默认顶部的按钮高度为36.中间的高度为44.底部的高度为56
+ #define TipCornerRadius 12
+ #define TipTopBtnH  36
+ #define ActionBtnH 44
+ #define SheetActionBtnH 56
+ */
+@property (nonatomic, assign) CGFloat alertActionH;
 
 /**
  // 默认的配置项.类属性.
@@ -264,6 +294,14 @@ typedef NS_ENUM (NSInteger, FQ_AlertActionButtonType)
  @return AlertView
  */
 + (instancetype)showTopAlertViewWithTitle:(NSString *)title message:(NSString *)message;
+
+/**
+ 获取当前提示框的宽度
+ 
+ @param alertType 提示类型
+ @return 提示框宽度
+ */
++(CGFloat)getAlertTypeWidth:(FQ_AlertType)alertType;
 
 /**
  如果有.即隐藏.没有就不隐藏
