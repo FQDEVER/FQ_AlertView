@@ -4,7 +4,7 @@
 **效果图**(ps:没有效果图,怎么看的下去)
 
  
-![AlertView.gif](http://upload-images.jianshu.io/upload_images/2100495-bde334396d68f31b.gif?imageMogr2/auto-orient/strip)
+![FQ_AlertTipView.gif](https://upload-images.jianshu.io/upload_images/2100495-fb54913b8d5bbb0d.gif?imageMogr2/auto-orient/strip)
 
 **前言:只是刚好看到别人App自定义的弹框挺不错.自己花点时间封装了一下.支持横竖屏切换!**
 
