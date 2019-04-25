@@ -1,5 +1,8 @@
 
 # FQ_AlertView
+[![Version](https://img.shields.io/cocoapods/v/FQ_AlertView.svg?style=flat)](http://cocoapods.org/pods/FQ_AlertView)
+[![License](https://img.shields.io/cocoapods/l/FQ_AlertView.svg?style=flat)](http://cocoapods.org/pods/FQ_AlertView)
+[![Platform](https://img.shields.io/cocoapods/p/FQ_AlertView.svg?style=flat)](http://cocoapods.org/pods/FQ_AlertView)
 
 **效果图**(ps:没有效果图,怎么看的下去)
 
