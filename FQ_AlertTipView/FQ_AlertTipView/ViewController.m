@@ -79,6 +79,12 @@
                      @{@"自定义底部View2":@"icon_calc"},
                      @{@"自定义底部View3":@"icon_calc"},
                      @{@"自定义底部View4":@"icon_calc"},
+                     @{@"开始定位":@"icon_calc"},
+                     @{@"开始推送":@"icon_calc"},
+                     @{@"开启摄像权限":@"icon_calc"},
+                     @{@"开启相册权限":@"icon_calc"},
+                     @{@"点赞鼓励":@"icon_calc"},
+                     @{@"名词解释":@"icon_calc"},
                      ];
     }
     return _dataArr;
@@ -136,19 +142,23 @@
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_FixedWH_FitWidth;
         alertConfiguration.coverBackgroundColor = [[UIColor whiteColor]colorWithAlphaComponent:0.5];
-        [FQ_AlertView showAlertViewWithTitle:@"可以的"  message:@"取消关注以后!您将再也收不到该用户的所有动态?"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"确定没骂你发送到,范士大夫,电视剧啊" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:@"取消发生发发呆时" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        alertConfiguration.separatorPadding = 1;
+        [FQ_AlertView showAlertViewWithTitle:@"可以的"  message:@"取消关注以后!您将再也收不到该用户的所有动态?"  alertType:FQ_AlertTypeActionAlert gradientActionStr:@"鼓励一下" confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil  cancelActionStr:@"冷漠无视" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
             NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
         }];
     }else if(indexPath.row == 2){
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_FixedWH_None;
-        [FQ_AlertView showAlertViewWithTitle:@"可以的"  message:nil  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"确定没骂你发送到,范士大夫,电视剧啊" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:@"取消发生发发呆时" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        [FQ_AlertView showAlertViewWithTitle:@"寻找腕表中"  message:@"腕表正在响铃+震动，请在您的附近仔细倾听寻找。"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"找到了" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
             NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
         }];
     }else if(indexPath.row == 3){
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
-        [FQ_AlertView showAlertViewWithTitle:nil  message:@"取消关注以后!您将再也收不到该用户的所有动态?"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"确定没骂你发送到,范士大夫,电视剧啊" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:@"取消发生发发呆时" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        alertConfiguration.coverBackgroundColor = [[UIColor whiteColor]colorWithAlphaComponent:0.5];
+        alertConfiguration.cancelBackgroundColor = Color(242);
+        alertConfiguration.cancelTextColor = RGBA(0, 122, 255, 1.0f);
+        [FQ_AlertView showAlertViewWithTitle:@"表盘下载失败"  message:@"表盘下载失败,请稍后尝试."  alertType:FQ_AlertTypeActionAlert confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:@"返回" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
             NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
         }];
     }else if(indexPath.row == 4){
@@ -170,7 +180,7 @@
             NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
         }];
     }else if(indexPath.row == 7){
-    
+        
         UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"ios_privacy_icon"]];
         logoImg.frame = CGRectMake(0, -132 * 0.5 + 10, 132, 132);
         logoImg.contentMode = UIViewContentModeScaleAspectFit;
@@ -189,31 +199,23 @@
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
         alertConfiguration.headerView = logoImg;
         alertConfiguration.customView = label;
-        alertConfiguration.separatorPadding = 0.0f;
-        alertConfiguration.actionBtnType = FQ_AlertActionButtonType_CornerRadius;
-        alertConfiguration.alertActionH = 32.0;
+        alertConfiguration.separatorPadding = 1.0f;
         
-        alertConfiguration.defaultBackgroundColor = RGBA(0, 102, 204, 1.0);
-        alertConfiguration.defaultTextColor = UIColor.whiteColor;
-        alertConfiguration.defaultTextFont = [UIFont systemFontOfSize:13];
-        alertConfiguration.confirmBackgroundColor = UIColor.whiteColor;
-        alertConfiguration.confirmTextColor = UIColor.grayColor;
-        alertConfiguration.confirmTextFont = [UIFont systemFontOfSize:13];
+        alertConfiguration.defaultBackgroundColor = UIColor.whiteColor;
+        alertConfiguration.defaultTextColor = UIColor.grayColor;
+        alertConfiguration.confirmBackgroundColor = RGBA(0, 102, 204, 1.0);
+        alertConfiguration.confirmTextColor = UIColor.whiteColor;
         
-        [FQ_AlertView showAlertViewWithTitle:@"军拓运动隐私政策"  message:nil  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"不同意" otherActionStrArr:@[@"同意"] destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        [FQ_AlertView showAlertViewWithTitle:@"军拓运动隐私政策"  message:nil  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"同意" otherActionStrArr:@[@"不同意"] destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
             if (index == 1) {
                 FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
                 alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
-                alertConfiguration.separatorPadding = 0.0f;
-                alertConfiguration.actionBtnType = FQ_AlertActionButtonType_CornerRadius;
-                alertConfiguration.alertActionH = 32.0;
-                alertConfiguration.defaultBackgroundColor = RGBA(0, 102, 204, 1.0);
-                alertConfiguration.defaultTextColor = UIColor.whiteColor;
-                alertConfiguration.defaultTextFont = [UIFont systemFontOfSize:13];
-                alertConfiguration.confirmBackgroundColor = UIColor.whiteColor;
-                alertConfiguration.confirmTextColor = UIColor.grayColor;
-                alertConfiguration.confirmTextFont = [UIFont systemFontOfSize:13];
-                [FQ_AlertView showAlertViewWithTitle:nil  message:@"\n若不同意协议.则无法继续登录哦.\n"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"退出" otherActionStrArr:@[@"我再想想"] destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+                alertConfiguration.separatorPadding = 1.0f;
+                alertConfiguration.defaultBackgroundColor = UIColor.whiteColor;
+                alertConfiguration.defaultTextColor = UIColor.grayColor;
+                alertConfiguration.confirmBackgroundColor = RGBA(0, 102, 204, 1.0);
+                alertConfiguration.confirmTextColor = UIColor.whiteColor;
+                [FQ_AlertView showAlertViewWithTitle:nil  message:@"\n若不同意协议.则无法继续登录哦.\n"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"我再想想" otherActionStrArr:@[@"退出"] destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
                     NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
                 }];
             }
@@ -247,21 +249,150 @@
         [FQ_AlertView showAlertViewWithTitle:nil  message:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到asflksjaflsjaflkasj,范士大夫,电视剧啊"  alertType:FQ_AlertTypeActionSheet confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:@"取消发生发发呆时" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
             NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
         }];
-    }else{
+    }else if(indexPath.row == 12){
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
         [FQ_AlertView showAlertViewWithTitle:nil  message:nil  alertType:FQ_AlertTypeActionSheet confirmActionStr:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到,范士大夫,电视剧啊" otherActionStrArr:nil destructiveActionStr:@"从手机相册选择了盛大交付了" cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
             NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
         }];
+    }else if(indexPath.row == 13){ //开始定位
+        
+        UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"navi"]];
+        logoImg.frame = CGRectMake(0, -88 * 0.5 + 10, 88, 88);
+        logoImg.contentMode = UIViewContentModeScaleAspectFit;
+        
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.isClickClear = NO;
+        alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
+        alertConfiguration.headerView = logoImg;
+        alertConfiguration.separatorPadding = 1.0f;
+        alertConfiguration.confirmBackgroundColor = RGBA(0, 122, 255, 1);
+        alertConfiguration.confirmTextColor = UIColor.whiteColor;
+        alertConfiguration.cancelBtnType = FQ_AlertCancelBtnType_Normal;
+        
+        [FQ_AlertView showAlertViewWithTitle:@"开启定位"  message:@"需要获取您的位置，腕表才能同步精确的天气信息"  alertType:FQ_AlertTypeActionAlert  gradientActionStr:@"现在开启" confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        }];
+    }else if(indexPath.row == 14){//开始推送
+        UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"navi"]];
+        logoImg.frame = CGRectMake(0, -88 * 0.5 + 10, 88, 88);
+        logoImg.contentMode = UIViewContentModeScaleAspectFit;
+        
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.isClickClear = NO;
+        alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
+        alertConfiguration.headerView = logoImg;
+        alertConfiguration.separatorPadding = 1.0f;
+        alertConfiguration.confirmBackgroundColor = RGBA(0, 122, 255, 1);
+        alertConfiguration.confirmTextColor = UIColor.whiteColor;
+        [FQ_AlertView showAlertViewWithTitle:@"开启定位"  message:@"需要获取您的位置，腕表才能同步精确的天气信息"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"现在开启" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        }];
+    }else if(indexPath.row == 15){//开启摄像权限
+        UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"navi"]];
+        logoImg.frame = CGRectMake(0, -88 * 0.5 + 10, 88, 88);
+        logoImg.contentMode = UIViewContentModeScaleAspectFit;
+        
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.isClickClear = NO;
+        alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
+        alertConfiguration.headerView = logoImg;
+        alertConfiguration.separatorPadding = 1.0f;
+        alertConfiguration.confirmBackgroundColor = RGBA(0, 122, 255, 1);
+        alertConfiguration.confirmTextColor = UIColor.whiteColor;
+        alertConfiguration.cancelBtnType = FQ_AlertCancelBtnType_TopRight;
+        
+        [FQ_AlertView showAlertViewWithTitle:@"开启定位"  message:@"需要获取您的位置，腕表才能同步精确的天气信息"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"现在开启" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        }];
+    }else if(indexPath.row == 16){//开启相册权限
+        UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"ios_privacy_icon"]];
+        logoImg.frame = CGRectMake(0, -132 * 0.5 + 10, 132, 132);
+        logoImg.contentMode = UIViewContentModeScaleAspectFit;
+        
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.isClickClear = NO;
+        alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
+        alertConfiguration.headerView = logoImg;
+        alertConfiguration.separatorPadding = 1.0f;
+        alertConfiguration.confirmBackgroundColor = RGBA(0, 122, 255, 1);
+        alertConfiguration.confirmTextColor = UIColor.whiteColor;
+        
+        [FQ_AlertView showAlertViewWithTitle:@"开启定位"  message:@"需要获取您的位置，腕表才能同步精确的天气信息"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"现在开启" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        }];
+    }else if(indexPath.row == 17){//点赞鼓励
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_FixedWH_FitWidth;
+        alertConfiguration.coverBackgroundColor = [[UIColor whiteColor]colorWithAlphaComponent:0.5];
+        alertConfiguration.separatorPadding = 12;
+        
+        alertConfiguration.confirmBackgroundColor = RGBA(0, 122, 255, 1);
+        alertConfiguration.confirmTextColor = UIColor.whiteColor;
+        
+        alertConfiguration.defaultBackgroundColor = Color(204);
+        alertConfiguration.defaultTextColor = UIColor.whiteColor;
+        
+        alertConfiguration.cancelTextColor = Color(170);
+        
+        [FQ_AlertView showAlertViewWithTitle:@"可以的"  message:@"取消关注以后!您将再也收不到该用户的所有动态?"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"鼓励一下" otherActionStrArr:@[@"不太满意.提意见"] destructiveActionStr:nil cancelActionStr:@"冷漠无视" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+            NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
+        }];
+    }else if(indexPath.row == 18){//名词解释
+        UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"ios_privacy_icon"]];
+        logoImg.frame = CGRectMake(0, -132 * 0.5 + 10, 132, 132);
+        logoImg.contentMode = UIViewContentModeScaleAspectFit;
+        
+//        UILabel *label = [[UILabel alloc]init];
+//        label.text = @"欢迎使用\"军拓运动\"！我们非常重视您的个人信息和隐私保护。在您使用\"军拓运动\"服务之前，请仔细阅读《军拓运动隐私政策》，我们将严格按照经您同意的各项条款使用您的个人信息，以便为您提供更好的服务。\n\n如您同意此政策，请点击\"同意\"并开始使用我们的产品和服务，我们会尽全力保护您的个人信息安全。\n";
+//        label.font = [UIFont systemFontOfSize:13];
+//        label.textColor = [UIColor darkGrayColor];
+//        label.numberOfLines = 0;
+//        CGFloat alertW = [FQ_AlertView getAlertTypeWidth:FQ_AlertTypeActionAlert];
+//        CGFloat labelH = [label sizeThatFits:CGSizeMake(alertW - 16 * 2.0, CGFLOAT_MAX)].height;
+//        label.frame = CGRectMake(16, 0, alertW - 16 * 2.0, labelH);
+        
+        CGFloat alertW = [FQ_AlertView getAlertTypeWidth:FQ_AlertTypeActionAlert];
+        CGFloat sumCustomViewW = alertW - 16 * 2.0;
+        
+        NSString * str = @"<h2><font color='#333333'>强度分钟数</font></h2><p><font color='#666666'>强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数</font></p><br/><h2><font color='#333333'>最大摄氧量</font></h2><p><font color='#666666'>最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量</font></p><br/><h2><font color='#333333'>强度分钟数</font></h2><p><font color='#666666'>强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数</font></p><br/><h2><font color='#333333'>最大摄氧量</font></h2><p><font color='#666666'>最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量</font></p><br/><h2><font color='#333333'>强度分钟数</font></h2><p><font color='#666666'>强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数强度分钟数</font></p><br/><h2><font color='#333333'>最大摄氧量</font></h2><p><font color='#666666'>最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量最大摄氧量</font></p><br/>";
+        
+        UITextView * textView = [[UITextView alloc]init];
+        textView.text = str;
+        textView.frame = self.view.bounds;
+        CGFloat labelH = [textView sizeThatFits:CGSizeMake(alertW - 16 * 2.0, CGFLOAT_MAX)].height;
+        textView.frame = CGRectMake(0, 0, sumCustomViewW, MIN(labelH, 300));
+        
+        NSAttributedString * attributedStr = [[NSAttributedString alloc]initWithData:[str dataUsingEncoding:NSUnicodeStringEncoding] options:@{NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType} documentAttributes:nil error:nil];
+        textView.attributedText = attributedStr;
+        [textView scrollRectToVisible:CGRectMake(0,0,1,1) animated:YES];
+        
+        CGFloat sumCustomViewH = textView.frame.size.height + 16;
+        UIImageView * imgView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"mask／overall_zhushi_bottom_mask"]];
+        imgView.frame = CGRectMake(0, sumCustomViewH - 48 - 16, sumCustomViewW, 48);
+        
+        UIView * customView = [[UIView alloc]initWithFrame:CGRectMake(16, 0, sumCustomViewW, sumCustomViewH)];
+        [customView addSubview:textView];
+        [customView addSubview:imgView];
+        
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.isClickClear = NO;
+        alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
+        alertConfiguration.headerView = logoImg;
+        alertConfiguration.customView = customView;
+        alertConfiguration.separatorPadding = 1.0f;
+        alertConfiguration.confirmBackgroundColor = RGBA(0, 122, 255, 1);
+        alertConfiguration.confirmTextColor = UIColor.whiteColor;
+        alertConfiguration.cancelBtnType = FQ_AlertCancelBtnType_Bottom;
+        
+        [FQ_AlertView showAlertViewWithTitle:nil  message:nil  alertType:FQ_AlertTypeActionAlert confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        }];
+        
     }
-
+    
 }
 
 /**
  可以根据自定义Custon.如进度条.选择关闭契机
  */
 -(void)clickCustomBtn{
-    [FQ_AlertView hidden];
+    [FQ_AlertView hiddenWithAnimation:YES];
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {

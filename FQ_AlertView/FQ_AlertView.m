@@ -22,26 +22,31 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 {
     if (self = [super init]) {
         self.defaultTextColor = DefaultTextColor;
-        self.defaultTextFont = [UIFont systemFontOfSize:18.0];// RegularFont(TitleFontSize);
+        self.defaultTextFont = ActionBtnFont;
         self.defaultBackgroundColor = OtherActionBackColor;
         
         self.confirmTextColor = ConfirmTextColor;
-        self.confirmTextFont = [UIFont systemFontOfSize:18.0];// RegularFont(TitleFontSize);
+        self.confirmTextFont = ActionBtnFont;
         self.confirmBackgroundColor = OtherActionBackColor;
         
         self.destructiveTextColor = DestructiveTextColor;
-        self.destructiveTextFont =[UIFont systemFontOfSize:18.0];// RegularFont(TitleFontSize);
+        self.destructiveTextFont = ActionBtnFont;
         self.destructiveBackgroundColor = OtherActionBackColor;
         
-        self.cancelTextColor = CancelTextColor;
-        self.cancelTextFont = [UIFont boldSystemFontOfSize:18.0];//RegularFont(TitleFontSize);
+        self.cancelTextColor = MidCancelTextColor;
+        self.cancelTextFont = ActionBtnFont;
         self.cancelBackgroundColor =  CancelBackgroundColor;
+        
+        self.gradientTextColor = UIColor.whiteColor;
+        self.gradientBackColors = @[(id)RGBA(0, 122, 255, 1).CGColor,(id)RGBA(0, 178, 255, 1).CGColor]; //使用CGColor
+        //        self.gradientBackColors = @[(id)RGBA(255, 182, 0, 1).CGColor,(id)RGBA(255, 207, 0, 1).CGColor]; //使用CGColor
+        self.gradientTextFont = ActionBtnFont;
         
         self.cornerRadius = TipCornerRadius;
         self.isClickClear = YES;
         self.messageTextAlignment = NSTextAlignmentCenter;
-        self.titleFont = [UIFont boldSystemFontOfSize:18.0]; //SemiboldFont(TitleFontSize);
-        self.messageFont = [UIFont systemFontOfSize:14.0]; //RegularFont(ContentFontSize);
+        self.titleFont = TitleTextFont;
+        self.messageFont = MessageTextFont;
         self.titleColor = TitleTextColor;
         self.messageColor = MessageTextColor;
         self.alertTipDefaultFont = [UIFont systemFontOfSize:14.0];
@@ -50,8 +55,8 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
         self.coverBackgroundColor = [[UIColor blackColor]colorWithAlphaComponent:0.3];
         self.isNeedCoverBackView =  YES;
         self.separatorPadding = 1.0f;
-        self.actionBtnType = FQ_AlertActionButtonType_Default;
         self.alertActionH = 0;
+        self.isClearAllAlertView = NO;
     }
     return self;
 }
@@ -74,11 +79,11 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 @end
 
 
-@implementation FQ_AlertViewManager
+@implementation JTFQ_NewAlertViewManager
 
 + (instancetype)shareManager
 {
-    static FQ_AlertViewManager *instance = nil;
+    static JTFQ_NewAlertViewManager *instance = nil;
     static dispatch_once_t alertManager;
     
     dispatch_once(&alertManager, ^{
@@ -142,6 +147,11 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 @property (strong, nonatomic) UIButton *coverBtn;
 
 /**
+ 取消按钮.默认隐藏
+ */
+@property (nonatomic, strong) UIButton *cancelBtn;
+
+/**
  //点击的按钮个数
  */
 @property (strong, nonatomic) NSMutableArray *actionArr;
@@ -191,34 +201,44 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
     FQScreenW = SJScreenW;
     FQScreenH = SJScreenH;
     
-    for (FQ_AlertView * alert in [FQ_AlertViewManager shareManager].alertViewArr) {
-        [alert fq_clickCoverView];
-    }
-    [[FQ_AlertViewManager shareManager].alertViewArr addObject:alertView];
-    
     alertView.titleStr = title;
     alertView.messageStr = message;
     alertView.alertType = alertType;
     alertView.configuration = configuration ? :FQ_AlertConfiguration.defaultConfiguration;
     
+    if (alertType != FQ_AlertTypeActionTop) {
+        for (FQ_AlertView * alert in [JTFQ_NewAlertViewManager shareManager].alertViewArr) {
+            if (alertView.configuration.isClearAllAlertView) {
+                [alert fq_clearAllAlertViewWithAnimation:NO];
+            }else{
+                [alert fq_temporaryClearAlertViewWithAnimation:YES];//临时清理.
+            }
+        }
+    }
+    [[JTFQ_NewAlertViewManager shareManager].alertViewArr addObject:alertView];
+    
     return alertView;
 }
 
 /**
- 快捷展示多种样式
+ 快捷展示多种样式 -有渐变
  
  @param title 标题
  @param message 内容信息
  @param alertType 展示样式
- @param confirmActionStr 确定Action样式文本
- @param otherActionStrArr 其他Action样式文本数组
+ @param gradientActionStr 渐变样式
+ @param confirmActionStr 确定样式
+ @param otherActionStrArr 其他样式
+ @param destructiveActionStr 删除样式
+ @param cancelActionStr 取消样式
  @param configuration 配置文件
- @param actionBlock 点击Action回调
+ @param actionBlock 点击回调
  @return AlertView
  */
 + (instancetype)showAlertViewWithTitle:(NSString *)title
                                message:(NSString *)message
                              alertType:(FQ_AlertType)alertType
+                     gradientActionStr:(NSString *)gradientActionStr
                       confirmActionStr:(NSString *)confirmActionStr
                      otherActionStrArr:(NSArray *)otherActionStrArr
                   destructiveActionStr:(NSString *)destructiveActionStr
@@ -229,6 +249,12 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
     FQ_AlertView * alertView = [FQ_AlertView showAlertViewWithTitle:title message:message alertType:alertType configuration:configuration];
     
     alertView.frame = CGRectMake(0, 0, FQScreenW, FQScreenH);//superView.bounds;
+    
+    if (gradientActionStr.length) {
+        FQ_AlertAction * gradient = [FQ_AlertAction actionWithTitle:gradientActionStr type:FQ_AlertActionStyleGradient handler:actionBlock];
+        gradient.actionBlock = actionBlock;
+        [alertView addAction:gradient];
+    }
     
     if (confirmActionStr.length) {
         FQ_AlertAction * confirm = [FQ_AlertAction actionWithTitle:confirmActionStr type:FQ_AlertActionStyleConfirm handler:actionBlock];
@@ -259,6 +285,33 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 }
 
 /**
+ 快捷展示多种样式 - 无渐变
+ 
+ @param title 标题
+ @param message 内容信息
+ @param alertType 展示样式
+ @param confirmActionStr 确定样式
+ @param otherActionStrArr 其他样式
+ @param destructiveActionStr 删除样式
+ @param cancelActionStr 取消样式
+ @param configuration 配置文件
+ @param actionBlock 点击回调
+ @return AlertView
+ */
++ (instancetype)showAlertViewWithTitle:(NSString *)title
+                               message:(NSString *)message
+                             alertType:(FQ_AlertType)alertType
+                      confirmActionStr:(NSString *)confirmActionStr
+                     otherActionStrArr:(NSArray *)otherActionStrArr
+                  destructiveActionStr:(NSString *)destructiveActionStr
+                       cancelActionStr:(NSString *)cancelActionStr
+                         configuration:(FQ_AlertConfiguration*)configuration
+                           actionBlock:(void(^)(FQ_AlertAction * action,NSInteger index))actionBlock
+{
+    return [FQ_AlertView showAlertViewWithTitle:title message:message alertType:alertType gradientActionStr:nil confirmActionStr:confirmActionStr otherActionStrArr:otherActionStrArr destructiveActionStr:destructiveActionStr cancelActionStr:cancelActionStr configuration:configuration actionBlock:actionBlock];
+}
+
+/**
  快捷展示顶部样式
  
  @param title 标题
@@ -267,23 +320,42 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
  */
 + (instancetype)showTopAlertViewWithTitle:(NSString *)title message:(NSString *)message
 {
-   return  [FQ_AlertView showAlertViewWithTitle:title message:message alertType:FQ_AlertTypeActionTop confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:nil actionBlock:nil];
+    FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+    alertConfiguration.isNeedCoverBackView = NO;
+    
+    return  [FQ_AlertView showAlertViewWithTitle:title message:message alertType:FQ_AlertTypeActionTop confirmActionStr:@"好的" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:nil];
+}
+
+/**
+ 快捷展示顶部样式
+ 
+ @param title 标题
+ @param message 内容信息
+ @return AlertView
+ */
++ (instancetype)showTopAlertViewWithTitle:(NSString *)title message:(NSString *)message isShowCoverView:(BOOL)isShowCover
+{
+    FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+    alertConfiguration.isNeedCoverBackView = isShowCover;
+    
+    return  [FQ_AlertView showAlertViewWithTitle:title message:message alertType:FQ_AlertTypeActionTop confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:nil];
 }
 
 /**
  如果有.即隐藏.没有就不隐藏
  */
-+ (void)hidden
++ (void)hiddenWithAnimation:(BOOL)animation
 {
-    for (FQ_AlertView * alert in [FQ_AlertViewManager shareManager].alertViewArr) {
-        [alert fq_clickCoverView];
+    NSMutableArray * alertViewArr =  [JTFQ_NewAlertViewManager shareManager].alertViewArr;
+    for (FQ_AlertView * alert in alertViewArr) {
+        [alert fq_clickCoverViewWithAnimation:animation completion:nil];
     }
 }
 
 
 /**
  获取当前提示框的宽度
-
+ 
  @param alertType 提示类型
  @return 提示框宽度
  */
@@ -371,14 +443,65 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
         self.alertContentView.transform = CGAffineTransformIdentity;
     } completion:^(BOOL finished) {
         if (self.alertType == FQ_AlertTypeActionTop) {
-            [self performSelector:@selector(fq_clickCoverView) withObject:nil afterDelay:2.6];
+            [self performSelector:@selector(fq_performSelectorClickTopAlertView) withObject:nil afterDelay:2.6];
         }
     }];
 }
 
--(void)hiddenAlertAnimation:(BOOL)animation{
+
+-(void)hiddenAlertAnimation:(BOOL)animation completion:(void (^ __nullable)(BOOL finished))completion{
+    
     //只允许存在一个
-    [UIView animateWithDuration:animation ? 0.5 :0 delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:0.5 options:0 animations:^{
+    [UIView animateWithDuration:animation ? 0.2 :0 delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:0.5 options:0 animations:^{
+        
+        if (self.configuration.isNeedCoverBackView) {
+            self.coverBtn.alpha = 0.0f;
+        }
+        if (self.alertType == FQ_AlertTypeActionTop) {
+            self.alertContentView.transform = CGAffineTransformMakeTranslation(0, -self.alertContentView.frame.size.height);
+        }else if(self.alertType == FQ_AlertTypeActionSheet){
+            self.alertContentView.transform = CGAffineTransformMakeTranslation(0, self.alertContentView.frame.size.height);
+        }else{
+            self.alertContentView.transform = CGAffineTransformMakeScale(0.95, 0.95);
+        }
+        self.alertContentView.alpha = 0;
+        
+    } completion:^(BOOL finished) {
+        
+        if (self.configuration.isNeedCoverBackView) {
+            [self.coverBtn removeFromSuperview];
+        }
+        [self removeFromSuperview];
+        [[JTFQ_NewAlertViewManager shareManager].alertViewArr removeObject:self];
+        if (self.alertType != FQ_AlertTypeActionTop) {
+            if ([JTFQ_NewAlertViewManager shareManager].alertViewArr.count > 0) {
+                FQ_AlertView * alert = [JTFQ_NewAlertViewManager shareManager].alertViewArr.firstObject;
+                [alert showAlertAnimation:YES];
+            }
+        }
+        if (completion) {
+            completion(finished);
+        }
+    }];
+}
+
+#pragma mark ============ 响应事件 ==============
+
+/**
+ 点击遮盖View
+ */
+-(void)fq_clickCoverViewWithAnimation:(BOOL)animation completion:(void (^ __nullable)(BOOL finished))completion
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fq_performSelectorClickTopAlertView) object:nil];
+    
+    [self hiddenAlertAnimation:animation completion:completion];
+}
+
+//一个是彻底清理掉
+-(void)fq_clearAllAlertViewWithAnimation:(BOOL)animation{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fq_performSelectorClickTopAlertView) object:nil];
+    //只允许存在一个
+    [UIView animateWithDuration:animation ? 0.1 :0 delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:0.5 options:0 animations:^{
         if (self.configuration.isNeedCoverBackView) {
             self.coverBtn.alpha = 0.0f;
         }
@@ -395,19 +518,33 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
             [self.coverBtn removeFromSuperview];
         }
         [self removeFromSuperview];
+        [[JTFQ_NewAlertViewManager shareManager].alertViewArr removeObject:self];
     }];
 }
 
-#pragma mark ============ 响应事件 ==============
-
-/**
- 点击遮盖View
- */
--(void)fq_clickCoverView
+//一个是暂时清理.当其他的完成时.再弹出
+-(void)fq_temporaryClearAlertViewWithAnimation:(BOOL)animation
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fq_clickCoverView) object:nil];
-    [self hiddenAlertAnimation:YES];
-    [[FQ_AlertViewManager shareManager].alertViewArr removeAllObjects];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fq_performSelectorClickTopAlertView) object:nil];
+    //只允许存在一个
+    [UIView animateWithDuration:animation ? 0.1 :0 delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:0.5 options:0 animations:^{
+        if (self.configuration.isNeedCoverBackView) {
+            self.coverBtn.alpha = 0.0f;
+        }
+        if (self.alertType == FQ_AlertTypeActionTop) {
+            self.alertContentView.transform = CGAffineTransformMakeTranslation(0, -self.alertContentView.frame.size.height);
+        }else if(self.alertType == FQ_AlertTypeActionSheet){
+            self.alertContentView.transform = CGAffineTransformMakeTranslation(0, self.alertContentView.frame.size.height);
+        }else{
+            self.alertContentView.transform = CGAffineTransformMakeScale(0.95, 0.95);
+        }
+        self.alertContentView.alpha = 0;
+    } completion:^(BOOL finished) {
+        if (self.configuration.isNeedCoverBackView) {
+            self.coverBtn.alpha = 0;
+        }
+        self.alpha = 0;
+    }];
 }
 
 
@@ -417,7 +554,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 -(void)clickClearCoverView
 {
     if (self.configuration.isClickClear) {
-        [self fq_clickCoverView];
+        [self fq_clickCoverViewWithAnimation:YES completion:nil];
     }
 }
 
@@ -429,15 +566,22 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
  */
 -(void)clickAlertBtn:(UIButton *)alertBtn
 {
-    FQ_AlertAction * alertAction = self.actionArr[alertBtn.tag - AlertActionTag];
+    __weak typeof(self) weakSelf = self;
     //先清除界面再调用block
-    [self fq_clickCoverView];
-    if (alertAction.actionBlock) {
-        alertAction.actionBlock(alertAction,alertBtn.tag- AlertActionTag);
-    }
+    [self fq_clickCoverViewWithAnimation:YES completion:^(BOOL finished) {
+        FQ_AlertAction * alertAction = weakSelf.actionArr[alertBtn.tag - AlertActionTag];
+        if (alertAction.actionBlock) {
+            alertAction.actionBlock(alertAction,alertBtn.tag- AlertActionTag);
+        }
+    }];
 }
 
-
+/**
+ 自动隐藏topView
+ */
+-(void)fq_performSelectorClickTopAlertView{
+    [self fq_clickCoverViewWithAnimation:YES completion:nil];
+}
 
 #pragma mark ============ 公共方法 ==============
 
@@ -453,6 +597,9 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
         style.tailIndent = -2; //设置与尾部的距离
         style.headIndent = 7;
         style.firstLineHeadIndent = 2.0f * font.pointSize;
+    }
+    if (font == nil) {
+        font = [UIFont boldSystemFontOfSize:15];
     }
     return @{ NSFontAttributeName: font,
               NSParagraphStyleAttributeName: style,
@@ -474,7 +621,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
     }else{
         return nil;
     }
-
+    
     //设置字体大小
     NSRange range = NSMakeRange(0, resultAttr.string.length);
     NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc]init];
@@ -497,19 +644,13 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
  */
 -(void)settingActionBtn:(UIButton *)button action:(FQ_AlertAction *)alertAction
 {
-    //默认的高亮色.
-    if (self.configuration.actionBtnType == FQ_AlertActionButtonType_CornerRadius) {
-        //只有取消样式才是这种效果
-        [button setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
-    }else{
-        [button setBackgroundImage:[self imageWithColor:[[UIColor whiteColor]colorWithAlphaComponent:0.2]] forState:UIControlStateHighlighted];
-    }
     switch (alertAction.actionType) {
         case FQ_AlertActionStyleDefault: //默认样式
         {
             [button setTitleColor:self.configuration.defaultTextColor forState:UIControlStateNormal];
             button.titleLabel.font = self.alertType == FQ_AlertTypeActionTop ? self.configuration.alertTipDefaultFont : self.configuration.defaultTextFont;
             [button setBackgroundImage:[self imageWithColor:self.configuration.defaultBackgroundColor] forState:UIControlStateNormal];
+            [button setBackgroundImage:[self imageWithColor:[self.configuration.defaultBackgroundColor colorWithAlphaComponent:0.8]] forState:UIControlStateHighlighted];
             break;
         }
         case FQ_AlertActionStyleConfirm:  //确定样式
@@ -517,6 +658,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
             [button setTitleColor:self.configuration.confirmTextColor forState:UIControlStateNormal];
             button.titleLabel.font = self.alertType == FQ_AlertTypeActionTop ? self.configuration.alertTipDefaultFont : self.configuration.confirmTextFont;
             [button setBackgroundImage:[self imageWithColor:self.configuration.confirmBackgroundColor] forState:UIControlStateNormal];
+            [button setBackgroundImage:[self imageWithColor:[self.configuration.confirmBackgroundColor colorWithAlphaComponent:0.8]] forState:UIControlStateHighlighted];
             break;
         }
         case FQ_AlertActionStyleDestructive: //慎重样式
@@ -524,23 +666,35 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
             [button setTitleColor:self.configuration.destructiveTextColor forState:UIControlStateNormal];
             button.titleLabel.font = self.alertType == FQ_AlertTypeActionTop ? self.configuration.alertTipDefaultFont : self.configuration.destructiveTextFont;
             [button setBackgroundImage:[self imageWithColor:self.configuration.destructiveBackgroundColor] forState:UIControlStateNormal];
+            [button setBackgroundImage:[self imageWithColor:[self.configuration.destructiveBackgroundColor colorWithAlphaComponent:0.8]] forState:UIControlStateHighlighted];
+            break;
+        }
+        case FQ_AlertActionStyleGradient: //渐变样式
+        {
+            [button setTitleColor:self.configuration.gradientTextColor forState:UIControlStateNormal];
+            button.titleLabel.font = self.alertType == FQ_AlertTypeActionTop ? self.configuration.alertTipDefaultFont : self.configuration.gradientTextFont;
+            
+            UIImage * img = [self imageWithGradientColors:self.configuration.gradientBackColors];
+            [button setBackgroundImage:img forState:UIControlStateNormal];
+            [button setBackgroundImage:img forState:UIControlStateHighlighted];
+            [button setTitleColor:[self.configuration.gradientTextColor colorWithAlphaComponent:0.8] forState:UIControlStateHighlighted];
             break;
         }
         case FQ_AlertActionStyleCancel: //取消样式
         {
-            [button setTitleColor:self.configuration.cancelTextColor forState:UIControlStateNormal];
+            
             button.titleLabel.font = self.alertType == FQ_AlertTypeActionTop ? self.configuration.alertTipCancelFont : self.configuration.cancelTextFont;
             [button setBackgroundImage:[self imageWithColor:self.configuration.cancelBackgroundColor] forState:UIControlStateNormal];
+            [button setTitleColor:self.configuration.cancelTextColor forState:UIControlStateNormal];
+            [button setBackgroundImage:[self imageWithColor:self.configuration.cancelBackgroundColor] forState:UIControlStateHighlighted];
+            [button setTitleColor:[self.configuration.cancelTextColor colorWithAlphaComponent:0.8] forState:UIControlStateHighlighted];
             
-            //只有取消样式才是这种效果
-            [button setBackgroundImage:[self imageWithColor:self.configuration.cancelTextColor] forState:UIControlStateHighlighted];
-            [button setTitleColor:self.configuration.cancelBackgroundColor forState:UIControlStateHighlighted];
             break;
         }
         default:
             break;
     }
-
+    
     if (self.configuration.actionBtnTextType == FQ_AlertActionButtonTextType_FixedWH_FitWidth) {
         button.titleLabel.adjustsFontSizeToFitWidth = YES;
     }else if (self.configuration.actionBtnTextType == FQ_AlertActionButtonTextType_FixedWH_None){
@@ -570,12 +724,12 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 
 /**
  获取纯色图片
-
+ 
  @param color 颜色值
  @return 图片
  */
 - (UIImage *)imageWithColor:(UIColor *)color{
-
+    
     CGSize size = CGSizeMake(1, 1);
     if (!color || size.width <= 0 || size.height <= 0) return nil;
     CGRect rect = CGRectMake(0.0f, 0.0f, size.width, size.height);
@@ -583,6 +737,31 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetFillColorWithColor(context, color.CGColor);
     CGContextFillRect(context, rect);
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
+/**
+ 获取渐变图
+ 
+ @param colors 渐变图色值
+ @return 图片
+ */
+-(UIImage *)imageWithGradientColors:(NSArray *)colors{
+    
+    CGFloat alertTipBtnW = [FQ_AlertView getAlertTypeWidth:self.alertType];
+    CGFloat alertTipBtnH = self.configuration.alertActionH;
+    CAGradientLayer *gradientLayer =  [CAGradientLayer layer];
+    gradientLayer.frame = CGRectMake(0, 0, alertTipBtnW, self.configuration.alertActionH);
+    gradientLayer.startPoint = CGPointMake(0, 0);
+    gradientLayer.endPoint = CGPointMake(1, 0);
+    gradientLayer.locations = @[@(0.5),@(1.0)];//渐变点
+    [gradientLayer setColors:colors];//渐变数组
+    
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(alertTipBtnW, alertTipBtnH), NO, UIScreen.mainScreen.scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [gradientLayer renderInContext:context];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
@@ -602,7 +781,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 
 /**
  屏幕横竖转换通知
-
+ 
  @param notification 通知对象
  */
 -(void)didChangStatusNotification:(NSNotification *)notification
@@ -615,17 +794,17 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
     }
     
     if (self.alertType == FQ_AlertTypeActionAlert) {
-
+        
         self.alertContentView.center = CGPointMake(FQScreenW * 0.5,FQScreenH * 0.5);
-
+        
     }else if(self.alertType == FQ_AlertTypeActionSheet){
-
+        
         CGSize oldSize = self.alertContentView.frame.size;
         self.alertContentView.frame = CGRectMake((FQScreenW - oldSize.width) * 0.5, FQScreenH - oldSize.height - (KIsiPhoneX ? 34 : 0), oldSize.width, oldSize.height);
     }else{
-
+        
         CGSize oldSize = self.alertContentView.frame.size;
-
+        
         self.alertContentView.frame = CGRectMake((FQScreenW - oldSize.width) * 0.5, KIsiPhoneX ? 34 : 20, oldSize.width, oldSize.height);
     }
 }
@@ -633,14 +812,14 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
-
+    
 }
 
 #pragma mark - Tool
 
 /**
  获取指定按钮的size
-
+ 
  @param button 指定按钮
  @param size 限制的最大size
  @return 按钮实际的尺寸
@@ -682,7 +861,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 -(UIView *)alertContentView
 {
     if (!_alertContentView) { //此时已经知道是某个alertView类型了
-
+        
         _alertContentView = [[UIView alloc]init];
         [self.backEffectView.contentView addSubview:self.textContentView];
         [_alertContentView addSubview:self.backEffectView];
@@ -692,14 +871,14 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
         }else{
             [KEY_WINDOW addSubview:_alertContentView];
         }
-    
-        _backEffectView.layer.cornerRadius = self.configuration.cornerRadius;
+        
+        _backEffectView.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
         _backEffectView.layer.masksToBounds = YES;
         
         if (self.configuration.headerView) {
             [_alertContentView addSubview:self.configuration.headerView];
         }
-    
+        
         [self.textContentView addSubview:self.titleLabel];
         [self.textContentView addSubview:self.messageLabel];
         
@@ -796,88 +975,55 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
         
         if (self.titleStr.length || self.messageStr.length) {
             contentViewSumH += 2 * FQAlertViewPaddingHeight;
-        }else{
-//            contentViewSumH = 2 * FQAlertViewPaddingHeight;//在都没有时.不需要间距
         }
         
-        self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH - self.configuration.separatorPadding);
-        
+        self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH - 1);
         if (self.alertType == FQ_AlertTypeActionAlert){
             CGFloat btnsSumH = 0.0f;
-            
-            BOOL isActionAlertLarget = NO;
-            if (self.actionArr.count == 2 && self.configuration.actionBtnTextType == FQ_AlertActionButtonTextType_TextWH) {
-                 UIButton * firstBtn = [self.alertContentView viewWithTag:0 + AlertActionTag];
-                 UIButton * secondBtn = [self.alertContentView viewWithTag:1 + AlertActionTag];
-                CGFloat firstBtnH = [self getButtonWithSize:firstBtn sizeThatFits:CGSizeMake(width - 20, CGFLOAT_MAX)].height + FQAlertViewPaddingHeight * 2;
-                CGFloat secondBtnH = [self getButtonWithSize:secondBtn sizeThatFits:CGSizeMake(width - 20, CGFLOAT_MAX)].height + FQAlertViewPaddingHeight * 2;
-                isActionAlertLarget = firstBtnH > self.configuration.alertActionH || secondBtnH > self.configuration.alertActionH;
-            }
             
             for (int i = 0; i < self.actionArr.count; ++i) {
                 
                 UIButton * button = [self.alertContentView viewWithTag:i + AlertActionTag];
                 
-                if (self.configuration.actionBtnTextType == FQ_AlertActionButtonTextType_TextWH){
-                    //计算其高度
-                    if (self.actionArr.count == 1) {
-                        //上下间距为22.
-                        CGFloat btnH = [self getButtonWithSize:button sizeThatFits:CGSizeMake(width - 20, CGFLOAT_MAX)].height + FQAlertViewPaddingHeight * 2;
-                        btnH = MAX(self.configuration.alertActionH, btnH);
-                        button.frame = CGRectMake(0, contentViewSumH, width, btnH);
-                        btnsSumH = btnH;
-                    }else if(self.actionArr.count == 2){
-                        if (isActionAlertLarget) {
-                            CGFloat btnH = [self getButtonWithSize:button sizeThatFits:CGSizeMake(width - 20, CGFLOAT_MAX)].height + FQAlertViewPaddingHeight * 2;
-                            btnH = MAX(self.configuration.alertActionH, btnH);
-                            button.frame = CGRectMake(0, contentViewSumH + btnsSumH, width, btnH);
-                            btnsSumH += (btnH + self.configuration.separatorPadding);
-                        }else{
-                            
-                            if (self.configuration.actionBtnType == FQ_AlertActionButtonType_CornerRadius) {
-                                button.layer.masksToBounds = YES;
-                                button.layer.cornerRadius = self.configuration.alertActionH * 0.5;
-                                button.layer.borderColor = button.currentTitleColor.CGColor;
-                                button.layer.borderWidth = 1.0;
-                                
-                                button.frame = CGRectMake(i == 0 ? FQAlertViewContentPaddingWidth : (width  * 0.5 + FQAlertViewContentPaddingWidth * 0.5), contentViewSumH, width * 0.5 - FQAlertViewContentPaddingWidth * 1.5, self.configuration.alertActionH);
-                                btnsSumH = self.configuration.alertActionH + FQAlertViewTitlePaddingHeight;
-                                
-                                self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH + btnsSumH);
-                            }else{
-                                button.frame = CGRectMake(i == 0 ? 0 : (width  * 0.5 + self.configuration.separatorPadding * 0.5), contentViewSumH, width * 0.5 - self.configuration.separatorPadding * 0.5, self.configuration.alertActionH);
-                                btnsSumH = self.configuration.alertActionH ;
-                            }
-                        }
-                    }else{
-                        
-                        CGSize size = [self getButtonWithSize:button sizeThatFits:CGSizeMake(width - 20, CGFLOAT_MAX)];
-                        CGFloat btnH = size.height + FQAlertViewPaddingHeight * 2;
-                        btnH = MAX(self.configuration.alertActionH, btnH);
-                        button.frame = CGRectMake(0, contentViewSumH + btnsSumH, width, btnH);
-                        btnsSumH += (btnH + self.configuration.separatorPadding);
-                    }
+                if (self.actionArr.count == 1) {
+                    button.frame = CGRectMake(0, contentViewSumH, width, self.configuration.alertActionH);
+                    btnsSumH = self.configuration.alertActionH;
                 }else{
-                    if (self.actionArr.count == 1) {
-                        button.frame = CGRectMake(0, contentViewSumH, width, self.configuration.alertActionH);
-                        btnsSumH = self.configuration.alertActionH;
-                    }else if(self.actionArr.count == 2){
-                        button.frame = CGRectMake(i == 0 ? 0 : (width  * 0.5 + self.configuration.separatorPadding * 0.5), contentViewSumH, width * 0.5 - self.configuration.separatorPadding * 0.5, self.configuration.alertActionH);
-                        btnsSumH = self.configuration.alertActionH ;
-                    }else{
-                        button.frame = CGRectMake(0, contentViewSumH + i * (self.configuration.alertActionH + self.configuration.separatorPadding), width, self.configuration.alertActionH);
-                        btnsSumH = self.configuration.alertActionH * self.actionArr.count + 1 * (self.actionArr.count - self.configuration.separatorPadding);
-                    }
+                    button.frame = CGRectMake(MidActionMargin, contentViewSumH + i * (self.configuration.alertActionH + self.configuration.separatorPadding), width - MidActionMargin * 2.0, self.configuration.alertActionH);
+                    btnsSumH = self.configuration.alertActionH * self.actionArr.count + self.configuration.separatorPadding * (self.actionArr.count - 1);
+                    button.layer.masksToBounds = YES;
+                    button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
                 }
             }
-            contentViewSumH += btnsSumH;
+            btnsSumH += (self.actionArr.count > 1 ? self.configuration.separatorPadding : 0);//如果是两种样式则使用10个间距
+            contentViewSumH += btnsSumH ;
             
             self.backEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-            self.alertContentView.frame = CGRectMake(0,0, width, contentViewSumH - self.configuration.separatorPadding);
+            self.alertContentView.frame = CGRectMake(0,0, width, contentViewSumH- 1);
             self.alertContentView.center = CGPointMake(FQScreenW * 0.5,FQScreenH * 0.5);
+            self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH - 1);
+            
+            self.cancelBtn.hidden = NO;
+            CGFloat alertW = [FQ_AlertView getAlertTypeWidth:self.alertType];
+            if (self.configuration.cancelBtnType == FQ_AlertCancelBtnType_None) {
+                self.cancelBtn.hidden = YES;
+            }else if(self.configuration.cancelBtnType == FQ_AlertCancelBtnType_Normal){
+                self.cancelBtn.frame = CGRectMake(alertW- 4 - 28, 4, 28, 28);
+                [self.textContentView addSubview:self.cancelBtn];
+            }else if(self.configuration.cancelBtnType == FQ_AlertCancelBtnType_TopRight){
+                CGFloat cancelBtnY = (FQScreenH - contentViewSumH) * 0.5 - 32 - 24;
+                CGFloat cancelBtnX = CGRectGetMaxX(self.alertContentView.frame) - 32;
+                self.cancelBtn.frame = CGRectMake(cancelBtnX, cancelBtnY, 32, 32);
+                [self.coverBtn addSubview:self.cancelBtn];
+            }else if(self.configuration.cancelBtnType == FQ_AlertCancelBtnType_Bottom){
+                CGFloat cancelBtnY = CGRectGetMaxY(self.alertContentView.frame) + 24;
+                CGFloat cancelBtnX = (FQScreenW - 32) * 0.5;
+                self.cancelBtn.frame = CGRectMake(cancelBtnX,cancelBtnY, 32, 32);
+                [self.coverBtn addSubview:self.cancelBtn];
+            }
             
         }else{
-        
+            
             CGFloat btnsSumH = 0.0f;
             BOOL isCancel = NO;
             for (int i = 0; i < self.actionArr.count; ++i) {
@@ -896,12 +1042,13 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
                         self.backEffectView.frame = CGRectMake(0, 0, width, contentViewSumH + btnsSumH - self.configuration.separatorPadding);
                         button.frame = CGRectMake(0, contentViewSumH + btnsSumH + 5, width, btnH);
                         btnsSumH += btnH + 5;
-                        button.layer.cornerRadius = self.configuration.cornerRadius;
+                        button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
                         button.layer.masksToBounds = YES;
                         isCancel = YES;
                     }
                 }else{
                     if (alertAction.actionType != FQ_AlertActionStyleCancel) {
+                        
                         button.frame = CGRectMake(0, contentViewSumH + btnsSumH, width, self.configuration.alertActionH);
                         btnsSumH += self.configuration.alertActionH + self.configuration.separatorPadding;
                         
@@ -909,7 +1056,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
                         self.backEffectView.frame = CGRectMake(0, 0, width, contentViewSumH + btnsSumH - self.configuration.separatorPadding);//其他增加了一次
                         button.frame = CGRectMake(0, contentViewSumH + btnsSumH + 5, width, self.configuration.alertActionH);
                         btnsSumH += self.configuration.alertActionH + 5;
-                        button.layer.cornerRadius = self.configuration.cornerRadius;
+                        button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
                         button.layer.masksToBounds = YES;
                         isCancel = YES;
                     }
@@ -917,7 +1064,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
             }
             contentViewSumH += btnsSumH;
             
-            CGFloat iphoneXBottomMargin = KIsiPhoneX ? 34 : 0;
+            CGFloat iphoneXBottomMargin = KIsiPhoneX ? 34 : 10;
             
             self.alertContentView.frame = CGRectMake((FQScreenW - width) * 0.5, FQScreenH - contentViewSumH - iphoneXBottomMargin, width, contentViewSumH);
             if (!isCancel) {
@@ -936,7 +1083,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
     if (!_backEffectView) {
         UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
         _backEffectView = [[UIVisualEffectView alloc] initWithEffect:effect];
-//        _backEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        //        _backEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
     return _backEffectView;
 }
@@ -978,6 +1125,23 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
         
     }
     return _coverBtn;
+}
+
+-(UIButton *)cancelBtn
+{
+    if (!_cancelBtn) {
+        
+        UIImage * cancelImg = [UIImage imageNamed:@"icon28_icon_top_cancel"];
+        if (self.configuration.cancelImg && self.configuration.cancelImg.length > 0) {
+            cancelImg = [UIImage imageNamed:self.configuration.cancelImg];
+        }
+        _cancelBtn = [[UIButton alloc]initWithFrame:CGRectZero];
+        [_cancelBtn setImage:cancelImg forState:UIControlStateNormal];
+        _cancelBtn.frame = CGRectMake([FQ_AlertView getAlertTypeWidth:self.alertType] - 4 - 28, 4, 28, 28);
+        [_cancelBtn addTarget:self action:@selector(fq_performSelectorClickTopAlertView) forControlEvents:UIControlEventTouchUpInside];
+        _cancelBtn.hidden = YES;
+    }
+    return _cancelBtn;
 }
 
 -(NSMutableArray *)actionArr
