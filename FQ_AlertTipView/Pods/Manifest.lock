@@ -1,21 +1,16 @@
 PODS:
-  - FQ_AlertView (0.0.1):
-    - Masonry
   - Masonry (1.1.0)
 
 DEPENDENCIES:
-  - FQ_AlertView
+  - Masonry
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - Masonry
-  https://github.com/FQDEVER/FQ_AlertView.git:
-    - FQ_AlertView
 
 SPEC CHECKSUMS:
-  FQ_AlertView: a2c1acd8524bb9563bd387bde6abb403cbd5839a
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
 
-PODFILE CHECKSUM: 05c19b7d7fdf738526ea2709ac5639a7840f954e
+PODFILE CHECKSUM: 5eeaffb98b34c1270a1740940d33677f02c47128
 
-COCOAPODS: 1.5.2
+COCOAPODS: 1.8.3

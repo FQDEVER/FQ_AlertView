@@ -1,9 +1,9 @@
 # Uncomment the next line to define a global platform for your project
-# platform :ios, '9.0'
+ platform :ios, '9.0'
 
-source 'https://github.com/CocoaPods/Specs.git' # 公共仓库地址
-source 'https://github.com/FQDEVER/FQ_AlertView.git'        #私有仓库地址
+#source 'https://github.com/CocoaPods/Specs.git' # 公共仓库地址
+#source 'https://github.com/FQDEVER/FQ_AlertView.git'        #私有仓库地址
 
 target 'FQ_AlertTipView' do
-    pod 'FQ_AlertView'
+    pod 'Masonry'
 end

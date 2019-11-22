@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7A3102D523547C21004032F6 /* PZXVerificationTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A3102D323547C20004032F6 /* PZXVerificationTextField.m */; };
+		7A3102D623547C21004032F6 /* PZXVerificationCodeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A3102D423547C20004032F6 /* PZXVerificationCodeView.m */; };
+		7A44EAD82387BFDF00C01ED2 /* FQ_AlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A44EAD62387BFDF00C01ED2 /* FQ_AlertView.m */; };
 		9C8BA2B3213E221900971F02 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8BA2B2213E221900971F02 /* AppDelegate.m */; };
 		9C8BA2B6213E221900971F02 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8BA2B5213E221900971F02 /* ViewController.m */; };
 		9C8BA2B9213E221900971F02 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C8BA2B7213E221900971F02 /* Main.storyboard */; };
@@ -36,6 +39,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7A3102D123547C20004032F6 /* PZXVerificationTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PZXVerificationTextField.h; sourceTree = "<group>"; };
+		7A3102D223547C20004032F6 /* PZXVerificationCodeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PZXVerificationCodeView.h; sourceTree = "<group>"; };
+		7A3102D323547C20004032F6 /* PZXVerificationTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PZXVerificationTextField.m; sourceTree = "<group>"; };
+		7A3102D423547C20004032F6 /* PZXVerificationCodeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PZXVerificationCodeView.m; sourceTree = "<group>"; };
+		7A44EAD62387BFDF00C01ED2 /* FQ_AlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FQ_AlertView.m; sourceTree = "<group>"; };
+		7A44EAD72387BFDF00C01ED2 /* FQ_AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FQ_AlertView.h; sourceTree = "<group>"; };
 		7C53E6F596AC5D9F0ADF7146 /* Pods-FQ_AlertTipView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FQ_AlertTipView.release.xcconfig"; path = "Pods/Target Support Files/Pods-FQ_AlertTipView/Pods-FQ_AlertTipView.release.xcconfig"; sourceTree = "<group>"; };
 		98B9885C0F9147F4606A6332 /* libPods-FQ_AlertTipView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-FQ_AlertTipView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C8BA2AE213E221900971F02 /* FQ_AlertTipView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FQ_AlertTipView.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +109,26 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7A3102D023547C20004032F6 /* PZXVerificationCodeTextField */ = {
+			isa = PBXGroup;
+			children = (
+				7A3102D123547C20004032F6 /* PZXVerificationTextField.h */,
+				7A3102D223547C20004032F6 /* PZXVerificationCodeView.h */,
+				7A3102D323547C20004032F6 /* PZXVerificationTextField.m */,
+				7A3102D423547C20004032F6 /* PZXVerificationCodeView.m */,
+			);
+			path = PZXVerificationCodeTextField;
+			sourceTree = "<group>";
+		};
+		7A44EAD52387BFDF00C01ED2 /* FQ_AlertView */ = {
+			isa = PBXGroup;
+			children = (
+				7A44EAD62387BFDF00C01ED2 /* FQ_AlertView.m */,
+				7A44EAD72387BFDF00C01ED2 /* FQ_AlertView.h */,
+			);
+			path = FQ_AlertView;
+			sourceTree = "<group>";
+		};
 		9C8BA2A5213E221900971F02 = {
 			isa = PBXGroup;
 			children = (
@@ -125,6 +154,8 @@
 		9C8BA2B0213E221900971F02 /* FQ_AlertTipView */ = {
 			isa = PBXGroup;
 			children = (
+				7A44EAD52387BFDF00C01ED2 /* FQ_AlertView */,
+				7A3102D023547C20004032F6 /* PZXVerificationCodeTextField */,
 				9C8BA2B1213E221900971F02 /* AppDelegate.h */,
 				9C8BA2B2213E221900971F02 /* AppDelegate.m */,
 				9C8BA2B4213E221900971F02 /* ViewController.h */,
@@ -308,9 +339,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A44EAD82387BFDF00C01ED2 /* FQ_AlertView.m in Sources */,
+				7A3102D623547C21004032F6 /* PZXVerificationCodeView.m in Sources */,
 				9C8BA2B6213E221900971F02 /* ViewController.m in Sources */,
 				9C8BA2C1213E221F00971F02 /* main.m in Sources */,
 				9C8BA2B3213E221900971F02 /* AppDelegate.m in Sources */,
+				7A3102D523547C21004032F6 /* PZXVerificationTextField.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

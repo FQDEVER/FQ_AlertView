@@ -27,8 +27,13 @@
 #define KIsiPhoneX  (FQAIS_IPHONE_X || FQAIS_IPHONE_Xr || FQAIS_IPHONE_Xs || FQAIS_IPHONE_Xs_Max)
 
 #define GetSystemVersion     [[[UIDevice currentDevice] systemVersion] floatValue]
-#define RegularFont(Size) GetSystemVersion >= 9.0 ? [UIFont fontWithName:@"PingFangSC-Regular" size:Size]:[UIFont systemFontOfSize:Size]
-#define SemiboldFont(Size) GetSystemVersion >= 9.0 ? [UIFont fontWithName:@"PingFangSC-Medium" size:Size]:[UIFont systemFontOfSize:Size]
+#define PFRegularFont(Size) GetSystemVersion >= 9.0 ? [UIFont fontWithName:@"PingFangSC-Regular" size:Size]:[UIFont systemFontOfSize:Size]
+#define PFMediumFont(Size) GetSystemVersion >= 9.0 ? [UIFont fontWithName:@"PingFangSC-Medium" size:Size]:[UIFont systemFontOfSize:Size]
+#define PFHeavyFont(Size) GetSystemVersion >= 9.0 ? [UIFont fontWithName:@"AvenirNext-Bold" size:Size]:[UIFont systemFontOfSize:Size]
+#define PFLightFont(Size) GetSystemVersion >= 9.0 ? [UIFont fontWithName:@"PingFangSC-Light" size:Size]:[UIFont systemFontOfSize:Size]
+#define PFBoldFont(Size) GetSystemVersion >= 9.0 ? [UIFont fontWithName:@"PingFangSC-Semibold" size:Size]:[UIFont systemFontOfSize:Size]
+
+
 #define FQKeyWindowRootView [[UIApplication sharedApplication] keyWindow].rootViewController.view
 //默认值
 #define TitleFontSize 18
@@ -37,9 +42,9 @@
 
 #define TitleTextColor Color(51)
 #define MessageTextColor Color(102)
-#define TitleTextFont SemiboldFont(18)
-#define MessageTextFont RegularFont(14)
-#define ActionBtnFont SemiboldFont(16)
+#define TitleTextFont PFMediumFont(18)
+#define MessageTextFont PFRegularFont(14)
+#define ActionBtnFont PFMediumFont(16)
 
 
 //居中样式的默认样式
@@ -59,7 +64,6 @@
 #define DestructiveTextColor RGBA(228,57,60,1.0)
 #define CancelBackgroundColor     [[UIColor whiteColor] colorWithAlphaComponent:1.0]
 #define OtherActionBackColor      [[UIColor whiteColor] colorWithAlphaComponent:1.0]
-#define BackViewBackgroundColor   [[UIColor whiteColor] colorWithAlphaComponent:1.0]
 
 
 #define TipCornerRadius 12
@@ -74,11 +78,6 @@
 //按钮Tag
 #define AlertActionTag 92841
 
-
-extern CGFloat const FQAlertViewPaddingWidth;
-extern CGFloat const FQAlertViewPaddingHeight;
-extern CGFloat const FQAlertViewTitlePaddingHeight;
-extern CGFloat const FQAlertViewContentPaddingWidth;
 
 //-------------------提示框样式----------------------
 typedef NS_ENUM (NSInteger, FQ_AlertType)
@@ -152,6 +151,7 @@ typedef enum : NSInteger{
 @property (strong, nonatomic) UIColor *gradientTextColor;
 @property (strong, nonatomic) NSArray *gradientBackColors; //使用CGColor
 @property (strong, nonatomic) UIFont  *gradientTextFont;
+@property (nonatomic, strong) UIImage *gradientBgImg;
 
 /**
  圆角大小
@@ -177,6 +177,16 @@ typedef enum : NSInteger{
  //自定义HeaderView.需要传入其Size.默认宽度为AlertW - 2 * FQAlertPaddingW.
  */
 @property (nonatomic, strong) UIView *headerView;
+
+/**
+ //alert自定义的文本描述部分-背景视图
+ */
+@property (nonatomic, strong) UIView *alertTextContentBgView;
+
+/**
+//alert背景毛玻璃效果.默认为UIBlurEffectStyleExtraLight
+*/
+@property (nonatomic, assign) UIBlurEffectStyle blurEffectStyle;
 
 /**
  //messageStr的对齐方式
@@ -251,6 +261,28 @@ typedef enum : NSInteger{
  展示取消按钮的样式.默认是FQ_AlertCancelBtnType_None类型
  */
 @property (nonatomic, assign) FQ_AlertCancelBtnType cancelBtnType;
+
+/// 文本描述背景色.一般指整个背景色
+@property (nonatomic, strong) UIColor *textContentBgColor;
+
+/// 当为两个按钮时.是使用横向布局还是纵向布局.横向布局指:两个action等分.纵向指的是:上下布局
+/// alert样式两个action是否为水平样式.默认为NO
+@property (nonatomic, assign) BOOL hasAlertActionHorizontal;
+
+/// 整个alertContentView的背景色.默认为透明
+@property (nonatomic, strong) UIColor* alertContentViewBgColor;
+
+/// titleLab/headerView与边界均与左右间距横向间距.默认为10.
+@property (nonatomic, assign) CGFloat fq_alertViewPaddingWidth;
+
+/// titlelab与headerView之间的间距纵向间距.以及messageLab与Action视图之间的间距为2 * fq_alertViewPaddingHeight.默认为8.0.
+@property (nonatomic, assign) CGFloat fq_alertViewPaddingHeight;
+
+/// 当有headerView时.使用fq_alertViewTitlePaddingHeight.无headerView时.使用fq_alertViewTitlePaddingHeight做title的间距.默认为20.0
+@property (nonatomic, assign) CGFloat fq_alertViewTitlePaddingHeight;
+
+/// messageLab与左右两侧的间距.默认为16.0
+@property (nonatomic, assign) CGFloat fq_alertViewContentPaddingWidth;
 
 /**
  // 默认的配置项.类属性.

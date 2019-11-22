@@ -13,10 +13,6 @@
 static FQ_AlertConfiguration * _defaultConfiguration = nil;
 static CGFloat FQScreenW = 0.0f;
 static CGFloat FQScreenH = 0.0f;
-CGFloat const FQAlertViewPaddingWidth = 10.0;
-CGFloat const FQAlertViewPaddingHeight = 8.0;
-CGFloat const FQAlertViewTitlePaddingHeight = 20.0;
-CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 
 -(instancetype)init
 {
@@ -57,6 +53,13 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
         self.separatorPadding = 1.0f;
         self.alertActionH = 0;
         self.isClearAllAlertView = NO;
+        self.textContentBgColor = UIColor.whiteColor;
+        self.blurEffectStyle = UIBlurEffectStyleExtraLight;
+        self.alertContentViewBgColor = UIColor.clearColor;
+        self.fq_alertViewPaddingWidth = 10.0f; //title/headerView/以及textContentView均与左右间距
+        self.fq_alertViewPaddingHeight = 8.0f; //title与顶部/title月headerView之间的间距
+        self.fq_alertViewTitlePaddingHeight = 20.0f;//当有headerView时.使用fq_alertViewTitlePaddingHeight.无headerView时.使用fq_alertViewTitlePaddingHeight做title的间距
+        self.fq_alertViewContentPaddingWidth = 16.0f;//message与左右两侧的间距
     }
     return self;
 }
@@ -452,8 +455,9 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 -(void)hiddenAlertAnimation:(BOOL)animation completion:(void (^ __nullable)(BOOL finished))completion{
     
     //只允许存在一个
-    [UIView animateWithDuration:animation ? 0.2 :0 delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:0.5 options:0 animations:^{
-        
+    //    [UIView animateWithDuration:animation ? 10.33 :0 delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:0.5 options:0 animations:^{
+    
+    [UIView animateWithDuration:animation ? 0.33 :0 animations:^{
         if (self.configuration.isNeedCoverBackView) {
             self.coverBtn.alpha = 0.0f;
         }
@@ -464,10 +468,12 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
         }else{
             self.alertContentView.transform = CGAffineTransformMakeScale(0.95, 0.95);
         }
-        self.alertContentView.alpha = 0;
-        
+        self.alertContentView.alpha = 0.0;
+        self.textContentView.alpha = 0.0;
+        self.backEffectView.alpha = 0.0;
+        self.messageLabel.alpha = 0.0;
+        self.titleLabel.alpha = 0.0;
     } completion:^(BOOL finished) {
-        
         if (self.configuration.isNeedCoverBackView) {
             [self.coverBtn removeFromSuperview];
         }
@@ -674,7 +680,10 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
             [button setTitleColor:self.configuration.gradientTextColor forState:UIControlStateNormal];
             button.titleLabel.font = self.alertType == FQ_AlertTypeActionTop ? self.configuration.alertTipDefaultFont : self.configuration.gradientTextFont;
             
-            UIImage * img = [self imageWithGradientColors:self.configuration.gradientBackColors];
+            UIImage * img = self.configuration.gradientBgImg;
+            if (!img && self.configuration.gradientBackColors.count > 1) {
+                img = [self imageWithGradientColors:self.configuration.gradientBackColors];
+            }
             [button setBackgroundImage:img forState:UIControlStateNormal];
             [button setBackgroundImage:img forState:UIControlStateHighlighted];
             [button setTitleColor:[self.configuration.gradientTextColor colorWithAlphaComponent:0.8] forState:UIControlStateHighlighted];
@@ -756,7 +765,17 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
     gradientLayer.frame = CGRectMake(0, 0, alertTipBtnW, self.configuration.alertActionH);
     gradientLayer.startPoint = CGPointMake(0, 0);
     gradientLayer.endPoint = CGPointMake(1, 0);
-    gradientLayer.locations = @[@(0.5),@(1.0)];//渐变点
+    
+    NSArray * locations = @[@(0.5),@(1.0)];
+    if (colors.count > 2) {
+        NSMutableArray * muArr = [NSMutableArray array];
+        CGFloat margin = 1.0 / (colors.count - 1);
+        for (int i = 0; i < colors.count; ++i) {
+            [muArr addObject:@(i * margin)];
+        }
+        locations = muArr.copy;
+    }
+    gradientLayer.locations = locations;
     [gradientLayer setColors:colors];//渐变数组
     
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(alertTipBtnW, alertTipBtnH), NO, UIScreen.mainScreen.scale);
@@ -863,6 +882,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
     if (!_alertContentView) { //此时已经知道是某个alertView类型了
         
         _alertContentView = [[UIView alloc]init];
+        _alertContentView.backgroundColor = self.configuration.alertContentViewBgColor;
         [self.backEffectView.contentView addSubview:self.textContentView];
         [_alertContentView addSubview:self.backEffectView];
         if (self.configuration.isNeedCoverBackView) {
@@ -872,8 +892,10 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
             [KEY_WINDOW addSubview:_alertContentView];
         }
         
-        _backEffectView.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
-        _backEffectView.layer.masksToBounds = YES;
+//        _backEffectView.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
+//        _backEffectView.layer.masksToBounds = YES;
+        _alertContentView.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
+        _alertContentView.layer.masksToBounds = YES;
         
         if (self.configuration.headerView) {
             [_alertContentView addSubview:self.configuration.headerView];
@@ -917,12 +939,13 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
         self.coverBtn.frame = KEY_WINDOW.bounds;
     }
     if (self.alertType == FQ_AlertTypeActionTop) {//顶部
-        self.titleLabel.attributedText = [self getAttrWithTextStr:self.titleStr textFont:SemiboldFont(15) textColor:[UIColor blackColor] descrStr:self.messageStr descrFont:RegularFont(13) descrColor:RGBA(88, 87, 86, 1.0)];
-        CGFloat titleH = [self.titleLabel sizeThatFits:CGSizeMake(width - FQAlertViewPaddingWidth * 2, MAXFLOAT)].height;
-        self.titleLabel.frame = CGRectMake(FQAlertViewPaddingWidth,FQAlertViewPaddingHeight, width - FQAlertViewPaddingWidth * 2, titleH);
+        self.titleLabel.attributedText = [self getAttrWithTextStr:self.titleStr textFont:PFMediumFont(15) textColor:[UIColor blackColor] descrStr:self.messageStr descrFont:PFRegularFont(13) descrColor:RGBA(88, 87, 86, 1.0)];
+        CGFloat titleH = [self.titleLabel sizeThatFits:CGSizeMake(width - self.configuration.fq_alertViewPaddingWidth * 2, MAXFLOAT)].height;
+        self.titleLabel.frame = CGRectMake(self.configuration.fq_alertViewPaddingWidth,self.configuration.fq_alertViewPaddingHeight, width - self.configuration.fq_alertViewPaddingWidth * 2, titleH);
         
-        contentViewSumH += CGRectGetMaxY(self.titleLabel.frame) + FQAlertViewPaddingHeight;
+        contentViewSumH += CGRectGetMaxY(self.titleLabel.frame) + self.configuration.fq_alertViewPaddingHeight;
         self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH);
+        self.configuration.alertTextContentBgView.frame = self.textContentView.bounds;
         
         for (int i = 0; i < self.actionArr.count; ++i) {
             UIButton * button = [self.alertContentView viewWithTag:i + AlertActionTag];
@@ -938,70 +961,85 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
     }else{//中部-底部
         
         if (self.configuration.headerView) {
-            self.configuration.headerView.frame = CGRectIntegral(CGRectMake(FQAlertViewPaddingWidth, self.configuration.headerView.frame.origin.y,width - 2 * FQAlertViewPaddingWidth, self.configuration.headerView.bounds.size.height));
+            self.configuration.headerView.frame = CGRectIntegral(CGRectMake(self.configuration.fq_alertViewPaddingWidth, self.configuration.headerView.frame.origin.y,width - 2 * self.configuration.fq_alertViewPaddingWidth, self.configuration.headerView.bounds.size.height));
             contentViewSumH += CGRectGetMaxY(self.configuration.headerView.frame);
         }
         
         if (self.titleStr.length > 0) {
             self.titleLabel.attributedText = [[NSAttributedString alloc]initWithString:self.titleStr attributes:[self textStyleWithAlignment:NSTextAlignmentCenter font:self.configuration.titleFont textColor:self.configuration.titleColor]];
-            CGFloat titleH = [self.titleLabel sizeThatFits:CGSizeMake(width - 2* FQAlertViewPaddingWidth, MAXFLOAT)].height;
-            CGFloat titleY = contentViewSumH > 0 ? contentViewSumH + FQAlertViewPaddingHeight : FQAlertViewTitlePaddingHeight;
-            self.titleLabel.frame = CGRectIntegral(CGRectMake(FQAlertViewPaddingWidth, titleY,width - 2* FQAlertViewPaddingWidth , titleH));
+            CGFloat titleH = [self.titleLabel sizeThatFits:CGSizeMake(width - 2* self.configuration.fq_alertViewPaddingWidth, MAXFLOAT)].height;
+            CGFloat titleY = contentViewSumH > 0 ? contentViewSumH + self.configuration.fq_alertViewPaddingHeight : self.configuration.fq_alertViewTitlePaddingHeight;
+            self.titleLabel.frame = CGRectIntegral(CGRectMake(self.configuration.fq_alertViewPaddingWidth, titleY,width - 2* self.configuration.fq_alertViewPaddingWidth , titleH));
             contentViewSumH = CGRectGetMaxY(self.titleLabel.frame);
         }
         
         if (self.messageStr.length > 0) {
             self.messageLabel.attributedText = [[NSAttributedString alloc]initWithString:self.messageStr attributes:[self textStyleWithAlignment:self.configuration.messageTextAlignment font:self.configuration.messageFont textColor:self.configuration.messageColor]];
-            CGFloat messageH = [self.messageLabel sizeThatFits:CGSizeMake(width - 2* FQAlertViewContentPaddingWidth, MAXFLOAT)].height;
+            CGFloat messageH = [self.messageLabel sizeThatFits:CGSizeMake(width - 2* self.configuration.fq_alertViewContentPaddingWidth, MAXFLOAT)].height;
             
-            CGFloat messageY = contentViewSumH > 0 ? contentViewSumH + FQAlertViewPaddingHeight : FQAlertViewTitlePaddingHeight;
-            self.messageLabel.frame = CGRectIntegral(CGRectMake(FQAlertViewContentPaddingWidth, messageY ,width - 2* FQAlertViewContentPaddingWidth , messageH));
+            CGFloat messageY = contentViewSumH > 0 ? contentViewSumH + self.configuration.fq_alertViewPaddingHeight : self.configuration.fq_alertViewTitlePaddingHeight;
+            self.messageLabel.frame = CGRectIntegral(CGRectMake(self.configuration.fq_alertViewContentPaddingWidth, messageY ,width - 2* self.configuration.fq_alertViewContentPaddingWidth , messageH));
             
             contentViewSumH = CGRectGetMaxY(self.messageLabel.frame);
         }
         
         if (self.configuration.customView) {
-            contentViewSumH += FQAlertViewPaddingHeight;
+            contentViewSumH += self.configuration.fq_alertViewPaddingHeight;
             CGFloat customViewH = self.configuration.customView.bounds.size.height;
             CGFloat customViewW = self.configuration.customView.bounds.size.width;
             CGFloat customViewX = self.configuration.customView.frame.origin.x;
             if (customViewW <= 0) {
-                customViewW = width - 2 * FQAlertViewPaddingWidth;
-                customViewX = FQAlertViewPaddingWidth;
+                customViewW = width - 2 * self.configuration.fq_alertViewPaddingWidth;
+                customViewX = self.configuration.fq_alertViewPaddingWidth;
             }
             self.configuration.customView.frame = CGRectIntegral(CGRectMake(customViewX, contentViewSumH,customViewW, customViewH));
             contentViewSumH += customViewH;
         }
         
         if (self.titleStr.length || self.messageStr.length) {
-            contentViewSumH += 2 * FQAlertViewPaddingHeight;
+            contentViewSumH += 2 * self.configuration.fq_alertViewPaddingHeight;
         }
         
         self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH - 1);
+        self.configuration.alertTextContentBgView.frame = self.textContentView.bounds;
         if (self.alertType == FQ_AlertTypeActionAlert){
             CGFloat btnsSumH = 0.0f;
             
-            for (int i = 0; i < self.actionArr.count; ++i) {
-                
-                UIButton * button = [self.alertContentView viewWithTag:i + AlertActionTag];
-                
-                if (self.actionArr.count == 1) {
-                    button.frame = CGRectMake(0, contentViewSumH, width, self.configuration.alertActionH);
-                    btnsSumH = self.configuration.alertActionH;
-                }else{
-                    button.frame = CGRectMake(MidActionMargin, contentViewSumH + i * (self.configuration.alertActionH + self.configuration.separatorPadding), width - MidActionMargin * 2.0, self.configuration.alertActionH);
-                    btnsSumH = self.configuration.alertActionH * self.actionArr.count + self.configuration.separatorPadding * (self.actionArr.count - 1);
-                    button.layer.masksToBounds = YES;
-                    button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
+            if ((self.actionArr.count == 2 || self.actionArr.count == 1) && self.configuration.hasAlertActionHorizontal == YES) {
+                for (int i = 0; i < self.actionArr.count; ++i) {
+                    UIButton * button = [self.alertContentView viewWithTag:i + AlertActionTag];
+                    button.frame = CGRectMake((self.configuration.separatorPadding + width / self.actionArr.count) * i, contentViewSumH, width / self.actionArr.count - self.configuration.separatorPadding * 0.5, self.configuration.alertActionH);
                 }
+                btnsSumH = self.configuration.alertActionH;
+            }else{
+                for (int i = 0; i < self.actionArr.count; ++i) {
+                    
+                    UIButton * button = [self.alertContentView viewWithTag:i + AlertActionTag];
+                    
+                    if (self.actionArr.count == 1) {
+                        button.frame = CGRectMake(0, contentViewSumH, width, self.configuration.alertActionH);
+                        btnsSumH = self.configuration.alertActionH;
+                    }else{
+                        button.frame = CGRectMake(MidActionMargin, contentViewSumH + i * (self.configuration.alertActionH + self.configuration.separatorPadding), width - MidActionMargin * 2.0, self.configuration.alertActionH);
+                        btnsSumH = self.configuration.alertActionH * self.actionArr.count + self.configuration.separatorPadding * (self.actionArr.count - 1);
+                        button.layer.masksToBounds = YES;
+                        button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
+                    }
+                }
+                btnsSumH += (self.actionArr.count > 1 ? self.configuration.separatorPadding : 0);//如果是两种样式则使用10个间距
             }
-            btnsSumH += (self.actionArr.count > 1 ? self.configuration.separatorPadding : 0);//如果是两种样式则使用10个间距
             contentViewSumH += btnsSumH ;
             
             self.backEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
             self.alertContentView.frame = CGRectMake(0,0, width, contentViewSumH- 1);
             self.alertContentView.center = CGPointMake(FQScreenW * 0.5,FQScreenH * 0.5);
-            self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH - 1);
+            
+            //这里需要分两种样式 - 一种就是contentTextView包含按钮.还有一种是contentTextView不包含按钮样式.只有当不包含且为两个action时生效
+            if (self.configuration.hasAlertActionHorizontal == NO) {//如果是纵向.则contentView包含action高度.否则不包含
+                self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH - 1);
+            }
+            
+            self.configuration.alertTextContentBgView.frame = self.textContentView.bounds;
             
             self.cancelBtn.hidden = NO;
             CGFloat alertW = [FQ_AlertView getAlertTypeWidth:self.alertType];
@@ -1030,7 +1068,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
                 UIButton * button = [self.alertContentView viewWithTag:i + AlertActionTag];
                 FQ_AlertAction *alertAction = self.actionArr[i];
                 if (self.configuration.actionBtnTextType == FQ_AlertActionButtonTextType_TextWH){
-                    CGFloat btnH = [self getButtonWithSize:button sizeThatFits:CGSizeMake(width - 20, CGFLOAT_MAX)].height + FQAlertViewPaddingHeight * 2;
+                    CGFloat btnH = [self getButtonWithSize:button sizeThatFits:CGSizeMake(width - 20, CGFLOAT_MAX)].height + self.configuration.fq_alertViewPaddingHeight * 2;
                     btnH = MAX(self.configuration.alertActionH, btnH);
                     //根据文本宽高.计算按钮的高度
                     if (alertAction.actionType != FQ_AlertActionStyleCancel) {
@@ -1081,7 +1119,7 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 -(UIVisualEffectView *)backEffectView
 {
     if (!_backEffectView) {
-        UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
+        UIBlurEffect *effect = [UIBlurEffect effectWithStyle:self.configuration.blurEffectStyle];
         _backEffectView = [[UIVisualEffectView alloc] initWithEffect:effect];
         //        _backEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
@@ -1092,7 +1130,11 @@ CGFloat const FQAlertViewContentPaddingWidth = 16.0;
 {
     if (!_textContentView) {
         _textContentView = [[UIView alloc]init];
-        _textContentView.backgroundColor = BackViewBackgroundColor;
+        _textContentView.backgroundColor = self.configuration.textContentBgColor;
+        //如果有背景视图.则使用文本描述背景视图
+        if (self.configuration.alertTextContentBgView) {
+            [_textContentView addSubview:self.configuration.alertTextContentBgView];
+        }
     }
     return _textContentView;
 }

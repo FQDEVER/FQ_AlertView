@@ -8,12 +8,15 @@
 
 #import "ViewController.h"
 #import "FQ_AlertView.h"
+#import "PZXVerificationCodeView.h"
 
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
 
 @property (strong, nonatomic) UITableView *tableView;
 
 @property (nonatomic, strong) NSArray *dataArr;
+
+@property(nonatomic,strong)PZXVerificationCodeView *pzxView;
 
 @end
 
@@ -66,26 +69,28 @@
 {
     if (!_dataArr) {
         _dataArr = @[
-                     @{@"顶部显示":@"icon_acceleration"},
-                     @{@"中间显示Type-FixedWH_FitWidth":@"icon_pip"},
-                     @{@"中间显示Type-FixedWH_None":@"icon_spring"},
-                     @{@"中间显示Type-TextWH":@"icon_rotation"},
-                     @{@"底部显示Type-FixedWH_FitWidth":@"icon_momentum"},
-                     @{@"底部显示Type-FixedWH_None":@"icon_rubber"},
-                     @{@"底部显示Type-TextWH":@"icon_flash"},
-                     @{@"自定义View1":@"icon_calc"},
-                     @{@"自定义View2":@"icon_calc"},
-                     @{@"自定义底部View1":@"icon_calc"},
-                     @{@"自定义底部View2":@"icon_calc"},
-                     @{@"自定义底部View3":@"icon_calc"},
-                     @{@"自定义底部View4":@"icon_calc"},
-                     @{@"开始定位":@"icon_calc"},
-                     @{@"开始推送":@"icon_calc"},
-                     @{@"开启摄像权限":@"icon_calc"},
-                     @{@"开启相册权限":@"icon_calc"},
-                     @{@"点赞鼓励":@"icon_calc"},
-                     @{@"名词解释":@"icon_calc"},
-                     ];
+            @{@"顶部显示":@"icon_acceleration"},
+            @{@"中间显示Type-FixedWH_FitWidth":@"icon_pip"},
+            @{@"中间显示Type-FixedWH_None":@"icon_spring"},
+            @{@"中间显示Type-TextWH":@"icon_rotation"},
+            @{@"底部显示Type-FixedWH_FitWidth":@"icon_momentum"},
+            @{@"底部显示Type-FixedWH_None":@"icon_rubber"},
+            @{@"底部显示Type-TextWH":@"icon_flash"},
+            @{@"自定义View1":@"icon_calc"},
+            @{@"自定义View2":@"icon_calc"},
+            @{@"自定义底部View1":@"icon_calc"},
+            @{@"自定义底部View2":@"icon_calc"},
+            @{@"自定义底部View3":@"icon_calc"},
+            @{@"自定义底部View4":@"icon_calc"},
+            @{@"开始定位":@"icon_calc"},
+            @{@"开始推送":@"icon_calc"},
+            @{@"开启摄像权限":@"icon_calc"},
+            @{@"开启相册权限":@"icon_calc"},
+            @{@"点赞鼓励":@"icon_calc"},
+            @{@"名词解释":@"icon_calc"},
+            @{@"输入框":@"icon_calc"},
+            @{@"观致样式":@"icon_calc"},
+        ];
     }
     return _dataArr;
 }
@@ -112,7 +117,7 @@
     tableviewCell.textLabel.textColor = [UIColor whiteColor];
     tableviewCell.accessoryType   =  UITableViewCellAccessoryDisclosureIndicator;
     tableviewCell.backgroundColor = [UIColor blackColor];
-    tableviewCell.textLabel.font = RegularFont(18);
+    tableviewCell.textLabel.font = PFRegularFont(18);
     
     return tableviewCell;
 }
@@ -339,14 +344,14 @@
         logoImg.frame = CGRectMake(0, -132 * 0.5 + 10, 132, 132);
         logoImg.contentMode = UIViewContentModeScaleAspectFit;
         
-//        UILabel *label = [[UILabel alloc]init];
-//        label.text = @"欢迎使用\"军拓运动\"！我们非常重视您的个人信息和隐私保护。在您使用\"军拓运动\"服务之前，请仔细阅读《军拓运动隐私政策》，我们将严格按照经您同意的各项条款使用您的个人信息，以便为您提供更好的服务。\n\n如您同意此政策，请点击\"同意\"并开始使用我们的产品和服务，我们会尽全力保护您的个人信息安全。\n";
-//        label.font = [UIFont systemFontOfSize:13];
-//        label.textColor = [UIColor darkGrayColor];
-//        label.numberOfLines = 0;
-//        CGFloat alertW = [FQ_AlertView getAlertTypeWidth:FQ_AlertTypeActionAlert];
-//        CGFloat labelH = [label sizeThatFits:CGSizeMake(alertW - 16 * 2.0, CGFLOAT_MAX)].height;
-//        label.frame = CGRectMake(16, 0, alertW - 16 * 2.0, labelH);
+        //        UILabel *label = [[UILabel alloc]init];
+        //        label.text = @"欢迎使用\"军拓运动\"！我们非常重视您的个人信息和隐私保护。在您使用\"军拓运动\"服务之前，请仔细阅读《军拓运动隐私政策》，我们将严格按照经您同意的各项条款使用您的个人信息，以便为您提供更好的服务。\n\n如您同意此政策，请点击\"同意\"并开始使用我们的产品和服务，我们会尽全力保护您的个人信息安全。\n";
+        //        label.font = [UIFont systemFontOfSize:13];
+        //        label.textColor = [UIColor darkGrayColor];
+        //        label.numberOfLines = 0;
+        //        CGFloat alertW = [FQ_AlertView getAlertTypeWidth:FQ_AlertTypeActionAlert];
+        //        CGFloat labelH = [label sizeThatFits:CGSizeMake(alertW - 16 * 2.0, CGFLOAT_MAX)].height;
+        //        label.frame = CGRectMake(16, 0, alertW - 16 * 2.0, labelH);
         
         CGFloat alertW = [FQ_AlertView getAlertTypeWidth:FQ_AlertTypeActionAlert];
         CGFloat sumCustomViewW = alertW - 16 * 2.0;
@@ -384,6 +389,49 @@
         [FQ_AlertView showAlertViewWithTitle:nil  message:nil  alertType:FQ_AlertTypeActionAlert confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
         }];
         
+    }else if(indexPath.row == 19){//输入框
+        
+        CGFloat alertW = [FQ_AlertView getAlertTypeWidth:FQ_AlertTypeActionAlert];
+        NSInteger codeCount = 6;
+        CGFloat codeViewW = (alertW - 2 * 16);
+        CGFloat  codeViewX = 16;
+        CGFloat codeViewItemWH = (codeViewW - 3 * (codeCount - 1))/ codeCount;
+        _pzxView = [[PZXVerificationCodeView alloc]initWithFrame:CGRectMake(codeViewX, 0, codeViewW, codeViewItemWH)];
+        _pzxView.selectedColor = [UIColor blackColor];
+        _pzxView.deselectColor = UIColor.grayColor;
+    //    _pzxView.center = self.view.center;
+        _pzxView.VerificationCodeNum = codeCount;
+        _pzxView.Spacing = 3;//每个格子间距属性
+        
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.isClickClear = NO;
+        alertConfiguration.customView = _pzxView;
+        
+        [FQ_AlertView showAlertViewWithTitle:@"请输入安全码" message:nil alertType:FQ_AlertTypeActionAlert gradientActionStr:@"确定" confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:@"取消" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+            if (index == 0) {
+                if (self.pzxView.vertificationCode.length != 6) {
+                    NSLog(@"------------请完善验证码");
+                }else{
+                    NSLog(@"-----------开始请求");
+                }
+            }
+        }];
+    }else if(indexPath.row == 20){
+        FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_FixedWH_FitWidth;
+        alertConfiguration.coverBackgroundColor = [[UIColor whiteColor]colorWithAlphaComponent:0.5];
+        alertConfiguration.separatorPadding = 1;
+        alertConfiguration.textContentBgColor = UIColor.whiteColor;
+        alertConfiguration.alertContentViewBgColor = UIColor.blackColor;
+        alertConfiguration.hasAlertActionHorizontal = YES;
+        
+        alertConfiguration.fq_alertViewTitlePaddingHeight = 30.0f;
+        alertConfiguration.fq_alertViewPaddingHeight = 20.0f;
+        
+        //一个的时候.
+        [FQ_AlertView showAlertViewWithTitle:@"可以的"  message:@"取消关注以后!您将再也收不到该用户的所有动态?"  alertType:FQ_AlertTypeActionAlert confirmActionStr:@"确定" otherActionStrArr:nil destructiveActionStr:nil  cancelActionStr:@"取消" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+            NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
+        }];
     }
     
 }
