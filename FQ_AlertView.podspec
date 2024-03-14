@@ -21,8 +21,8 @@ s.source_files              = 'FQ_AlertView/*.{h,m}'
 
 s.platform                  = :ios
 
-s.ios.deployment_target      = '8.0'
+s.ios.deployment_target      = '11.0'
 
-s.dependency                'Masonry'
+#s.dependency                'Masonry'
 
 end
