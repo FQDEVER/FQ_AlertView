@@ -187,7 +187,7 @@
     }else if(indexPath.row == 7){
         
         UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"ios_privacy_icon"]];
-        logoImg.frame = CGRectMake(0, -132 * 0.5 + 10, 132, 132);
+        logoImg.frame = CGRectMake(0, 10, 132, 132);
         logoImg.contentMode = UIViewContentModeScaleAspectFit;
         
         UILabel *label = [[UILabel alloc]init];
@@ -250,8 +250,22 @@
         }];
     }else if(indexPath.row == 11){
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+        alertConfiguration.separatorPadding = 1.0;
+        alertConfiguration.cornerRadius = 20.0;
+        alertConfiguration.alertContentViewBgColor = UIColor.clearColor;
+//        alertConfiguration.textContentBgColor = UIColor.grayColor;
+        //底部时
+        // alertTextContentBgView 顶部文本区
+//        UIView * alertTextContentBgView = [[UIView alloc]init];
+//        alertTextContentBgView.backgroundColor = UIColor.redColor;
+//        alertConfiguration.alertTextContentBgView = alertTextContentBgView;
+//        //整个区域
+//        alertConfiguration.alertContentViewBgColor = UIColor.blueColor;
+//        // 非取消按钮区域
+//        alertConfiguration.textContentBgColor = UIColor.orangeColor;
+        
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
-        [FQ_AlertView showAlertViewWithTitle:nil  message:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到asflksjaflsjaflkasj,范士大夫,电视剧啊"  alertType:FQ_AlertTypeActionSheet confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:@"取消发生发发呆时" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
+        [FQ_AlertView showAlertViewWithTitle:nil  message:@"确定没骂你发送到,范士大夫,电视剧啊确定没骂你发送到asflksjaflsjaflkasj,范士大夫,电视剧啊"  alertType:FQ_AlertTypeActionSheet confirmActionStr:@"确定" otherActionStrArr:nil destructiveActionStr:@"删除" cancelActionStr:@"取消" configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
             NSLog(@"action= %@",action.title); //根据字符串比较找到对应的Action事件做处理
         }];
     }else if(indexPath.row == 12){
@@ -263,7 +277,7 @@
     }else if(indexPath.row == 13){ //开始定位
         
         UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"navi"]];
-        logoImg.frame = CGRectMake(0, -88 * 0.5 + 10, 88, 88);
+        logoImg.frame = CGRectMake(0, 10, 88, 88);
         logoImg.contentMode = UIViewContentModeScaleAspectFit;
         
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
@@ -271,15 +285,25 @@
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_TextWH;
         alertConfiguration.headerView = logoImg;
         alertConfiguration.separatorPadding = 1.0f;
+        alertConfiguration.cornerRadius = 8;
         alertConfiguration.confirmBackgroundColor = RGBA(0, 122, 255, 1);
         alertConfiguration.confirmTextColor = UIColor.whiteColor;
         alertConfiguration.cancelBtnType = FQ_AlertCancelBtnType_Normal;
+        
+//        UIView * alertTextContentBgView = [[UIView alloc]init];
+//        alertTextContentBgView.backgroundColor = UIColor.redColor;
+//        alertConfiguration.alertTextContentBgView = alertTextContentBgView;
+        //整个区域
+        alertConfiguration.alertContentViewBgColor = UIColor.whiteColor;
+        // 非取消按钮区域
+//        alertConfiguration.textContentBgColor = UIColor.orangeColor;
+                
         
         [FQ_AlertView showAlertViewWithTitle:@"开启定位"  message:@"需要获取您的位置，腕表才能同步精确的天气信息"  alertType:FQ_AlertTypeActionAlert  gradientActionStr:@"现在开启" confirmActionStr:nil otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:^(FQ_AlertAction *action, NSInteger index) {
         }];
     }else if(indexPath.row == 14){//开始推送
         UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"navi"]];
-        logoImg.frame = CGRectMake(0, -88 * 0.5 + 10, 88, 88);
+        logoImg.frame = CGRectMake(0, 10, 88, 88);
         logoImg.contentMode = UIViewContentModeScaleAspectFit;
         
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
@@ -293,7 +317,7 @@
         }];
     }else if(indexPath.row == 15){//开启摄像权限
         UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"navi"]];
-        logoImg.frame = CGRectMake(0, -88 * 0.5 + 10, 88, 88);
+        logoImg.frame = CGRectMake(0, 10, 88, 88);
         logoImg.contentMode = UIViewContentModeScaleAspectFit;
         
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
@@ -309,7 +333,7 @@
         }];
     }else if(indexPath.row == 16){//开启相册权限
         UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"ios_privacy_icon"]];
-        logoImg.frame = CGRectMake(0, -132 * 0.5 + 10, 132, 132);
+        logoImg.frame = CGRectMake(0, 10, 132, 132);
         logoImg.contentMode = UIViewContentModeScaleAspectFit;
         
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
@@ -341,7 +365,7 @@
         }];
     }else if(indexPath.row == 18){//名词解释
         UIImageView *logoImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"ios_privacy_icon"]];
-        logoImg.frame = CGRectMake(0, -132 * 0.5 + 10, 132, 132);
+        logoImg.frame = CGRectMake(0, 10, 132, 132);
         logoImg.contentMode = UIViewContentModeScaleAspectFit;
         
         //        UILabel *label = [[UILabel alloc]init];
@@ -420,11 +444,11 @@
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_FixedWH_FitWidth;
         alertConfiguration.coverBackgroundColor = [[UIColor whiteColor]colorWithAlphaComponent:0.5];
-        alertConfiguration.separatorPadding = 1;
+        alertConfiguration.separatorPadding = 0.5;
         alertConfiguration.textContentBgColor = UIColor.whiteColor;
-        alertConfiguration.alertContentViewBgColor = UIColor.blackColor;
+        alertConfiguration.alertContentViewBgColor = UIColor.lightGrayColor;
         alertConfiguration.hasAlertActionHorizontal = YES;
-        
+        alertConfiguration.textContentCornerRadius = 0.0;
         alertConfiguration.fq_alertViewTitlePaddingHeight = 30.0f;
         alertConfiguration.fq_alertViewPaddingHeight = 20.0f;
         

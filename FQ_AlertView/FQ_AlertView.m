@@ -39,7 +39,9 @@ static CGFloat FQScreenH = 0.0f;
         self.gradientTextFont = ActionBtnFont;
         
         self.cornerRadius = TipCornerRadius;
+        self.textContentCornerRadius = TipCornerRadius;
         self.isClickClear = YES;
+        self.hasClickActionClear = YES;
         self.messageTextAlignment = NSTextAlignmentCenter;
         self.titleFont = TitleTextFont;
         self.messageFont = MessageTextFont;
@@ -54,7 +56,7 @@ static CGFloat FQScreenH = 0.0f;
         self.alertActionH = 0;
         self.isClearAllAlertView = NO;
         self.textContentBgColor = UIColor.whiteColor;
-        self.blurEffectStyle = UIBlurEffectStyleExtraLight;
+        self.blurEffectStyle = UIBlurEffectStyleDark;
         self.alertContentViewBgColor = UIColor.clearColor;
         self.fq_alertViewPaddingWidth = 10.0f; //title/headerView/以及textContentView均与左右间距
         self.fq_alertViewPaddingHeight = 8.0f; //title与顶部/title月headerView之间的间距
@@ -78,6 +80,14 @@ static CGFloat FQScreenH = 0.0f;
         _defaultConfiguration = defaultConfiguration;
     }
 }
+
+//让文本设置保持一致
+-(void)setCornerRadius:(CGFloat)cornerRadius
+{
+    _cornerRadius = cornerRadius;
+    self.textContentCornerRadius = cornerRadius;
+}
+
 
 @end
 
@@ -323,10 +333,12 @@ static CGFloat FQScreenH = 0.0f;
  */
 + (instancetype)showTopAlertViewWithTitle:(NSString *)title message:(NSString *)message
 {
-    FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
-    alertConfiguration.isNeedCoverBackView = NO;
-    
-    return  [FQ_AlertView showAlertViewWithTitle:title message:message alertType:FQ_AlertTypeActionTop confirmActionStr:@"好的" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:nil];
+    NSLog(@"=====================>提示:%@",message);
+    return nil;
+//    FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
+//    alertConfiguration.isNeedCoverBackView = NO;
+//    alertConfiguration.isClearAllAlertView = YES;
+//    return  [FQ_AlertView showAlertViewWithTitle:title message:message alertType:FQ_AlertTypeActionTop confirmActionStr:@"好的" otherActionStrArr:nil destructiveActionStr:nil cancelActionStr:nil configuration:alertConfiguration actionBlock:nil];
 }
 
 /**
@@ -363,8 +375,10 @@ static CGFloat FQScreenH = 0.0f;
  @return 提示框宽度
  */
 +(CGFloat)getAlertTypeWidth:(FQ_AlertType)alertType{
-    if (alertType == FQ_AlertTypeActionTop || alertType == FQ_AlertTypeActionSheet) {
-        return MIN(FQScreenH, FQScreenW) - 16.0;
+    if (alertType == FQ_AlertTypeActionTop) {
+        return MIN(FQScreenH, FQScreenW - 16);
+    }else if(alertType == FQ_AlertTypeActionSheet){
+        return MIN(FQScreenH, FQScreenW);
     }else{
         return MidAlertViewWidth;
     }
@@ -373,11 +387,18 @@ static CGFloat FQScreenH = 0.0f;
 #pragma mark ============ 视图展示逻辑 ==============
 
 /**
+ 删除当前指定的alertview
+ */
+- (void)clearCurrentAlertView:(BOOL)animation{
+    [self fq_clickCoverViewWithAnimation:animation completion:nil];
+}
+
+/**
  展示提示框
  */
 -(void)showAlertView
 {
-    [[[UIApplication sharedApplication] keyWindow] endEditing:YES];
+    [KEY_WINDOW endEditing:YES];
     [self layoutIfNeeded];
     [self initializeAlertView];
     [self subviewsValidateView];
@@ -406,9 +427,9 @@ static CGFloat FQScreenH = 0.0f;
 -(void)uploadAlertViewWithAnimation:(BOOL)animation
 {
     UIView * transforView = self.alertContentView;
-    if (KEY_WINDOW.bounds.size.width < KEY_WINDOW.bounds.size.height && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+    if (KEY_WINDOW.bounds.size.width < KEY_WINDOW.bounds.size.height && UIInterfaceOrientationIsLandscape([self getStatusBarOrientation])) {
         //旋转
-        BOOL isLeft = [UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft;
+        BOOL isLeft = [self getStatusBarOrientation] == UIInterfaceOrientationLandscapeLeft;
         
         CGFloat angleFloat = isLeft ? -M_PI_2 : M_PI_2;
         transforView.transform = CGAffineTransformMakeRotation(angleFloat);
@@ -416,6 +437,7 @@ static CGFloat FQScreenH = 0.0f;
     }else{
         transforView.transform = CGAffineTransformIdentity;
     }
+    
     //更新布局时.保障在最上层
     if (self.configuration.isNeedCoverBackView) {
         [KEY_WINDOW bringSubviewToFront:self.coverBtn];
@@ -477,8 +499,9 @@ static CGFloat FQScreenH = 0.0f;
         if (self.configuration.isNeedCoverBackView) {
             [self.coverBtn removeFromSuperview];
         }
-        [self removeFromSuperview];
         [[JTFQ_NewAlertViewManager shareManager].alertViewArr removeObject:self];
+        self.hidden = YES;
+        [self removeFromSuperview];
         if (self.alertType != FQ_AlertTypeActionTop) {
             if ([JTFQ_NewAlertViewManager shareManager].alertViewArr.count > 0) {
                 FQ_AlertView * alert = [JTFQ_NewAlertViewManager shareManager].alertViewArr.firstObject;
@@ -573,13 +596,20 @@ static CGFloat FQScreenH = 0.0f;
 -(void)clickAlertBtn:(UIButton *)alertBtn
 {
     __weak typeof(self) weakSelf = self;
-    //先清除界面再调用block
-    [self fq_clickCoverViewWithAnimation:YES completion:^(BOOL finished) {
+    if (self.configuration.hasClickActionClear) {
+        //先清除界面再调用block
+        [self fq_clickCoverViewWithAnimation:YES completion:^(BOOL finished) {
+            FQ_AlertAction * alertAction = weakSelf.actionArr[alertBtn.tag - AlertActionTag];
+            if (alertAction.actionBlock) {
+                alertAction.actionBlock(alertAction,alertBtn.tag- AlertActionTag);
+            }
+        }];
+    }else{
         FQ_AlertAction * alertAction = weakSelf.actionArr[alertBtn.tag - AlertActionTag];
         if (alertAction.actionBlock) {
             alertAction.actionBlock(alertAction,alertBtn.tag- AlertActionTag);
         }
-    }];
+    }
 }
 
 /**
@@ -597,13 +627,13 @@ static CGFloat FQScreenH = 0.0f;
     style.paragraphSpacing = 0.3f * font.lineHeight;
     style.alignment = alignment;
     
-    if (alignment == NSTextAlignmentCenter) {
-        style.firstLineHeadIndent = 0;
-    }else{
-        style.tailIndent = -2; //设置与尾部的距离
-        style.headIndent = 7;
-        style.firstLineHeadIndent = 2.0f * font.pointSize;
-    }
+//    if (alignment == NSTextAlignmentCenter) {
+//        style.firstLineHeadIndent = 0;
+//    }else{
+//        style.tailIndent = -2; //设置与尾部的距离
+//        style.headIndent = 7;
+//        style.firstLineHeadIndent = 2.0f * font.pointSize;
+//    }
     if (font == nil) {
         font = [UIFont boldSystemFontOfSize:15];
     }
@@ -795,8 +825,33 @@ static CGFloat FQScreenH = 0.0f;
 -(void)addNotification
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didChangStatusNotification:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keybordNotification:) name:UIKeyboardWillChangeFrameNotification object:nil];
 }
 
+#pragma mark - 通知
+-(void)keybordNotification:(NSNotification *)aNotification{
+    NSLog(@"info ------ %@",aNotification);
+    if (self.alertType == FQ_AlertTypeActionAlert) {//只有中间的样式
+        //  Getting keyboard animation duration
+        CGFloat duration = [[aNotification userInfo][UIKeyboardAnimationDurationUserInfoKey] floatValue];
+        CGFloat animationDuration = 0.25;
+        //Saving animation duration
+        if (duration != 0.0)    animationDuration = duration;
+        
+        CGRect oldKBFrame = self.alertContentView.frame;
+        
+        //  Getting UIKeyboardSize.
+        CGRect kbFrame = [[aNotification userInfo][UIKeyboardFrameEndUserInfoKey] CGRectValue];
+        if (kbFrame.origin.y == SJScreenH) {
+            oldKBFrame.origin.y = (kbFrame.origin.y - oldKBFrame.size.height)*0.5;
+        }else{
+            oldKBFrame.origin.y = kbFrame.origin.y - oldKBFrame.size.height;
+        }
+        [UIView animateWithDuration:animationDuration animations:^{
+            self.alertContentView.frame = oldKBFrame;
+        }];
+    }
+}
 
 /**
  屏幕横竖转换通知
@@ -818,20 +873,21 @@ static CGFloat FQScreenH = 0.0f;
         
     }else if(self.alertType == FQ_AlertTypeActionSheet){
         
-        CGSize oldSize = self.alertContentView.frame.size;
-        self.alertContentView.frame = CGRectMake((FQScreenW - oldSize.width) * 0.5, FQScreenH - oldSize.height - (KIsiPhoneX ? 34 : 0), oldSize.width, oldSize.height);
+        CGSize oldSize = self.alertContentView.frame.size;//- (self.isIphoneX ? 34 : 0)
+        self.alertContentView.frame = CGRectMake((FQScreenW - oldSize.width) * 0.5, FQScreenH - oldSize.height, oldSize.width, oldSize.height);//+ (self.isIphoneX ? 34 : 0)
     }else{
         
         CGSize oldSize = self.alertContentView.frame.size;
         
-        self.alertContentView.frame = CGRectMake((FQScreenW - oldSize.width) * 0.5, KIsiPhoneX ? 34 : 20, oldSize.width, oldSize.height);
+        self.alertContentView.frame = CGRectMake((FQScreenW - oldSize.width) * 0.5, self.isIphoneX ? 34 : 20, oldSize.width, oldSize.height);
     }
 }
 
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
-    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
+    NSLog(@"---------------------%s",__func__);
 }
 
 #pragma mark - Tool
@@ -883,8 +939,9 @@ static CGFloat FQScreenH = 0.0f;
         
         _alertContentView = [[UIView alloc]init];
         _alertContentView.backgroundColor = self.configuration.alertContentViewBgColor;
-        [self.backEffectView.contentView addSubview:self.textContentView];
-        [_alertContentView addSubview:self.backEffectView];
+//        [self.backEffectView.contentView addSubview:self.textContentView];
+//        [_alertContentView addSubview:self.backEffectView];
+        [_alertContentView addSubview:self.textContentView];
         if (self.configuration.isNeedCoverBackView) {
             [self.coverBtn addSubview:_alertContentView];
             [KEY_WINDOW addSubview:self.coverBtn];
@@ -892,14 +949,17 @@ static CGFloat FQScreenH = 0.0f;
             [KEY_WINDOW addSubview:_alertContentView];
         }
         
-//        _backEffectView.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
+//        _backEffectView.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? TipCornerRadius : self.configuration.cornerRadius;
 //        _backEffectView.layer.masksToBounds = YES;
-        _alertContentView.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
-        _alertContentView.layer.masksToBounds = YES;
+        self.textContentView.layer.cornerRadius = self.configuration.textContentCornerRadius;
+        self.textContentView.layer.masksToBounds = YES;
         
-        if (self.configuration.headerView) {
+        self.alertContentView.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? TipCornerRadius : self.configuration.cornerRadius;
+        
+        if (self.configuration.headerView) {//有header不裁剪.以防裁减了
             [_alertContentView addSubview:self.configuration.headerView];
         }
+        self.alertContentView.layer.masksToBounds = YES;
         
         [self.textContentView addSubview:self.titleLabel];
         [self.textContentView addSubview:self.messageLabel];
@@ -917,8 +977,11 @@ static CGFloat FQScreenH = 0.0f;
             [self settingActionBtn:button action:alertAction];
             if (alertAction.actionType == FQ_AlertActionStyleCancel && self.alertType == FQ_AlertTypeActionSheet) {
                 [_alertContentView addSubview:button];
+            }else if(alertAction.actionType != FQ_AlertActionStyleCancel && self.alertType == FQ_AlertTypeActionSheet){
+//                [self.backEffectView.contentView addSubview:button];
+                [self.textContentView addSubview:button];
             }else{
-                [self.backEffectView.contentView addSubview:button];
+                [_alertContentView addSubview:button];
             }
             count ++;
         }
@@ -955,14 +1018,16 @@ static CGFloat FQScreenH = 0.0f;
         if (self.actionArr.count) {
             contentViewSumH += btnsSumH;
         }
-        self.backEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        self.alertContentView.frame = CGRectMake((FQScreenW - width) * 0.5, KIsiPhoneX ? 34 : 20, width, contentViewSumH);
+//        self.backEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.textContentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.alertContentView.frame = CGRectMake((FQScreenW - width) * 0.5, self.isIphoneX ? 34 : 20, width, contentViewSumH);
         
     }else{//中部-底部
         
         if (self.configuration.headerView) {
             self.configuration.headerView.frame = CGRectIntegral(CGRectMake(self.configuration.fq_alertViewPaddingWidth, self.configuration.headerView.frame.origin.y,width - 2 * self.configuration.fq_alertViewPaddingWidth, self.configuration.headerView.bounds.size.height));
             contentViewSumH += CGRectGetMaxY(self.configuration.headerView.frame);
+            
         }
         
         if (self.titleStr.length > 0) {
@@ -1000,17 +1065,18 @@ static CGFloat FQScreenH = 0.0f;
             contentViewSumH += 2 * self.configuration.fq_alertViewPaddingHeight;
         }
         
-        self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH - 1);
+        self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH - self.configuration.separatorPadding);
         self.configuration.alertTextContentBgView.frame = self.textContentView.bounds;
         if (self.alertType == FQ_AlertTypeActionAlert){
             CGFloat btnsSumH = 0.0f;
             
-            if ((self.actionArr.count == 2 || self.actionArr.count == 1) && self.configuration.hasAlertActionHorizontal == YES) {
+            if ((self.actionArr.count == 2 || self.actionArr.count == 1)  && self.configuration.hasAlertActionHorizontal == YES) {
                 for (int i = 0; i < self.actionArr.count; ++i) {
                     UIButton * button = [self.alertContentView viewWithTag:i + AlertActionTag];
                     button.frame = CGRectMake((self.configuration.separatorPadding + width / self.actionArr.count) * i, contentViewSumH, width / self.actionArr.count - self.configuration.separatorPadding * 0.5, self.configuration.alertActionH);
                 }
-                btnsSumH = self.configuration.alertActionH;
+                //添加分割线
+                btnsSumH = self.configuration.alertActionH + self.configuration.separatorPadding;
             }else{
                 for (int i = 0; i < self.actionArr.count; ++i) {
                     
@@ -1023,14 +1089,15 @@ static CGFloat FQScreenH = 0.0f;
                         button.frame = CGRectMake(MidActionMargin, contentViewSumH + i * (self.configuration.alertActionH + self.configuration.separatorPadding), width - MidActionMargin * 2.0, self.configuration.alertActionH);
                         btnsSumH = self.configuration.alertActionH * self.actionArr.count + self.configuration.separatorPadding * (self.actionArr.count - 1);
                         button.layer.masksToBounds = YES;
-                        button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
+                        button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? TipCornerRadius : self.configuration.cornerRadius;
                     }
                 }
                 btnsSumH += (self.actionArr.count > 1 ? self.configuration.separatorPadding : 0);//如果是两种样式则使用10个间距
             }
             contentViewSumH += btnsSumH ;
             
-            self.backEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+//            self.backEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+//            self.textContentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
             self.alertContentView.frame = CGRectMake(0,0, width, contentViewSumH- 1);
             self.alertContentView.center = CGPointMake(FQScreenW * 0.5,FQScreenH * 0.5);
             
@@ -1047,7 +1114,7 @@ static CGFloat FQScreenH = 0.0f;
                 self.cancelBtn.hidden = YES;
             }else if(self.configuration.cancelBtnType == FQ_AlertCancelBtnType_Normal){
                 self.cancelBtn.frame = CGRectMake(alertW- 4 - 28, 4, 28, 28);
-                [self.textContentView addSubview:self.cancelBtn];
+                [self.alertContentView addSubview:self.cancelBtn];
             }else if(self.configuration.cancelBtnType == FQ_AlertCancelBtnType_TopRight){
                 CGFloat cancelBtnY = (FQScreenH - contentViewSumH) * 0.5 - 32 - 24;
                 CGFloat cancelBtnX = CGRectGetMaxX(self.alertContentView.frame) - 32;
@@ -1077,10 +1144,11 @@ static CGFloat FQScreenH = 0.0f;
                         
                     }else{
                         
-                        self.backEffectView.frame = CGRectMake(0, 0, width, contentViewSumH + btnsSumH - self.configuration.separatorPadding);
+//                        self.backEffectView.frame = CGRectMake(0, 0, width, contentViewSumH + btnsSumH - self.configuration.separatorPadding);
+                        self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH + btnsSumH - self.configuration.separatorPadding);
                         button.frame = CGRectMake(0, contentViewSumH + btnsSumH + 5, width, btnH);
                         btnsSumH += btnH + 5;
-                        button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
+                        button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? TipCornerRadius : self.configuration.cornerRadius;
                         button.layer.masksToBounds = YES;
                         isCancel = YES;
                     }
@@ -1091,10 +1159,11 @@ static CGFloat FQScreenH = 0.0f;
                         btnsSumH += self.configuration.alertActionH + self.configuration.separatorPadding;
                         
                     }else{
-                        self.backEffectView.frame = CGRectMake(0, 0, width, contentViewSumH + btnsSumH - self.configuration.separatorPadding);//其他增加了一次
+//                        self.backEffectView.frame = CGRectMake(0, 0, width, contentViewSumH + btnsSumH - self.configuration.separatorPadding);//其他增加了一次
+                        self.textContentView.frame = CGRectMake(0, 0, width, contentViewSumH + btnsSumH - self.configuration.separatorPadding);//其他增加了一次
                         button.frame = CGRectMake(0, contentViewSumH + btnsSumH + 5, width, self.configuration.alertActionH);
                         btnsSumH += self.configuration.alertActionH + 5;
-                        button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? MidCornerRadius : self.configuration.cornerRadius;
+                        button.layer.cornerRadius = self.alertType == FQ_AlertTypeActionAlert ? TipCornerRadius : self.configuration.cornerRadius;
                         button.layer.masksToBounds = YES;
                         isCancel = YES;
                     }
@@ -1102,17 +1171,49 @@ static CGFloat FQScreenH = 0.0f;
             }
             contentViewSumH += btnsSumH;
             
-            CGFloat iphoneXBottomMargin = KIsiPhoneX ? 34 : 10;
+            CGFloat iphoneXBottomMargin = self.isIphoneX ? 34 : 0;
+            self.alertContentView.frame = CGRectMake((FQScreenW - width) * 0.5, FQScreenH - contentViewSumH - iphoneXBottomMargin, width, contentViewSumH + iphoneXBottomMargin);
             
-            self.alertContentView.frame = CGRectMake((FQScreenW - width) * 0.5, FQScreenH - contentViewSumH - iphoneXBottomMargin, width, contentViewSumH);
             if (!isCancel) {
-                self.backEffectView.frame = self.alertContentView.bounds;
-                
+//                self.backEffectView.frame = self.alertContentView.bounds;
+                self.textContentView.frame = self.alertContentView.bounds;
             }
         }
     }
 }
 
+#pragma mark - 兼容iOS13.0
+
+-(BOOL)isIphoneX{
+    if (@available(iOS 13.0, *)) {
+        UIStatusBarManager *statusBarManager = [UIApplication sharedApplication].windows.firstObject.windowScene.statusBarManager;
+        return statusBarManager.statusBarFrame.size.height > 20;
+    } else {
+        return UIApplication.sharedApplication.statusBarFrame.size.height > 20;
+    }
+//    if (@available(iOS 11.0, *)) {
+//        if ([UIApplication.sharedApplication.delegate respondsToSelector:@selector(window)]) {
+//            return UIApplication.sharedApplication.delegate.window.safeAreaInsets.left > 0 || UIApplication.sharedApplication.delegate.window.safeAreaInsets.bottom > 0;
+//        }else{
+//            if (@available(iOS 13.0, *)) {
+//                UIStatusBarManager *statusBarManager = [UIApplication sharedApplication].windows.firstObject.windowScene.statusBarManager;
+//                return statusBarManager.statusBarFrame.size.height > 20;
+//            } else {
+//                return UIApplication.sharedApplication.statusBarFrame.size.height > 20;
+//            }
+//        }
+//    } else {
+//        return NO;
+//    }
+}
+
+-(UIInterfaceOrientation)getStatusBarOrientation{
+    if (@available(iOS 13.0, *)) {
+        return UIApplication.sharedApplication.windows.firstObject.windowScene.interfaceOrientation;
+    }else{
+        return UIApplication.sharedApplication.statusBarOrientation;
+    }
+}
 
 #pragma mark - 初始化控件
 
@@ -1173,9 +1274,11 @@ static CGFloat FQScreenH = 0.0f;
 {
     if (!_cancelBtn) {
         
-        UIImage * cancelImg = [UIImage imageNamed:@"icon28_icon_top_cancel"];
+//        UIImage * cancelImg = [UIImage imageNamed:@"icon28_icon_top_cancel"];
+        UIImage * cancelImg = [self loadBundleImage:@"icon28_icon_top_cancel"];
         if (self.configuration.cancelImg && self.configuration.cancelImg.length > 0) {
-            cancelImg = [UIImage imageNamed:self.configuration.cancelImg];
+//            cancelImg = [UIImage imageNamed:self.configuration.cancelImg];
+            cancelImg = [self loadBundleImage:self.configuration.cancelImg];
         }
         _cancelBtn = [[UIButton alloc]initWithFrame:CGRectZero];
         [_cancelBtn setImage:cancelImg forState:UIControlStateNormal];
@@ -1185,6 +1288,21 @@ static CGFloat FQScreenH = 0.0f;
     }
     return _cancelBtn;
 }
+
+-(UIImage *)loadBundleImage:(NSString *)imageName{
+
+    // 获取当前的bundle,self只是在当前pod库中的一个类，也可以随意写一个其他的类
+    NSBundle *currentBundle = [NSBundle bundleForClass:[self class]];
+    NSString * path = [NSString stringWithFormat:@"%@/%@",currentBundle.resourcePath,@"PublicTool.bundle"];
+    currentBundle = [[NSBundle alloc]initWithPath:path];
+    if (@available(iOS 13.0, *)) {
+        return [UIImage imageNamed:imageName inBundle:currentBundle withConfiguration:nil];
+    } else {
+        // Fallback on earlier versions
+        return  [UIImage imageNamed:imageName inBundle:currentBundle compatibleWithTraitCollection:nil];
+    }
+}
+
 
 -(NSMutableArray *)actionArr
 {

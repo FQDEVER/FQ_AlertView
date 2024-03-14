@@ -8,11 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #define RGBA(r, g, b, a)           [UIColor colorWithRed:r/255.0f green:g/255.0f blue:b/255.0f alpha:a]
+#define RGB(r, g, b)           [UIColor colorWithRed:r/255.0f green:g/255.0f blue:b/255.0f alpha:1.0]
 #define Color(r)                    RGBA(r, r, r, 1)
 #define GlobalBlueColor             RGBA(9.0, 99.0, 204.0, 1.0)
+#define UIColorFromHexValue(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
+
+
 #define SJScreenH      [UIScreen mainScreen].bounds.size.height
 #define SJScreenW      [UIScreen mainScreen].bounds.size.width
-#define KEY_WINDOW        [[UIApplication sharedApplication] keyWindow]
+#define KEY_WINDOW        [UIApplication sharedApplication].windows.firstObject
 
 //是否是 iphone X
 #define FQAIS_IPHONE_X ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) : NO)
@@ -33,19 +37,18 @@
 #define PFLightFont(Size) GetSystemVersion >= 9.0 ? [UIFont fontWithName:@"PingFangSC-Light" size:Size]:[UIFont systemFontOfSize:Size]
 #define PFBoldFont(Size) GetSystemVersion >= 9.0 ? [UIFont fontWithName:@"PingFangSC-Semibold" size:Size]:[UIFont systemFontOfSize:Size]
 
-
 #define FQKeyWindowRootView [[UIApplication sharedApplication] keyWindow].rootViewController.view
 //默认值
 #define TitleFontSize 18
 #define ContentFontSize 14
 #define AlertViewW MIN(SJScreenH,SJScreenW)
 
-#define TitleTextColor Color(51)
-#define MessageTextColor Color(102)
+#define TitleTextColor RGBA(51, 51, 51, 1)
+#define MessageTextColor RGBA(102, 102, 102, 1)
 #define TitleTextFont PFMediumFont(18)
 #define MessageTextFont PFRegularFont(14)
 #define ActionBtnFont PFMediumFont(16)
-
+#define FFFFFF(a) [UIColor.whiteColor colorWithAlphaComponent:a]
 
 //居中样式的默认样式
 #define MidConfirmTextColor [[UIColor whiteColor] colorWithAlphaComponent:1.0]
@@ -66,8 +69,7 @@
 #define OtherActionBackColor      [[UIColor whiteColor] colorWithAlphaComponent:1.0]
 
 
-#define TipCornerRadius 12
-#define MidCornerRadius 5
+#define TipCornerRadius 8
 #define TipTopBtnH  36
 #define ActionBtnH 44
 #define SheetActionBtnH 56
@@ -159,9 +161,19 @@ typedef enum : NSInteger{
 @property (assign, nonatomic) CGFloat cornerRadius;
 
 /**
+ 文本内容的圆角大小
+ */
+@property (assign, nonatomic) CGFloat textContentCornerRadius;
+
+/**
  //能否点击遮盖消失
  */
 @property (assign, nonatomic) BOOL isClickClear;
+
+/**
+ 是否点击Action按钮隐藏视图.默认为YES
+ */
+@property (nonatomic, assign) BOOL hasClickActionClear;
 
 /**
  遮罩背景颜色
@@ -417,6 +429,11 @@ typedef enum : NSInteger{
 // ============ 自定义弹框顺序时.需要使用以下方法 ==============
 
 /**
+ 删除当前指定的alertview
+ */
+- (void)clearCurrentAlertView:(BOOL)animation;
+
+/**
  展示提示框
  */
 -(void)showAlertView;
@@ -427,7 +444,7 @@ typedef enum : NSInteger{
 -(void)addAction:(FQ_AlertAction *)alertAction;
 
 /**
- 基础展示
+ 基础展示 - 配合showAlertView以及addAction使用
  
  @param title 标题
  @param message 内容信息
