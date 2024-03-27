@@ -131,6 +131,10 @@
     if (indexPath.row == 0 ) {
         FQ_AlertConfiguration *configuration = FQ_AlertConfiguration.defaultConfiguration;
         configuration.isNeedCoverBackView = NO;
+        configuration.titleColor = UIColor.blackColor;
+        configuration.messageColor = UIColor.darkGrayColor;
+        configuration.separatorPadding = 1.0;
+        configuration.alertContentViewBgColor = UIColor.whiteColor;
         FQ_AlertView * alertView = [FQ_AlertView showAlertViewWithTitle:@"title" message:@"message" alertType:FQ_AlertTypeActionTop configuration:configuration];
         
         FQ_AlertAction * test = [FQ_AlertAction actionWithTitle:@"查看" type:FQ_AlertActionStyleCancel handler:^(FQ_AlertAction *action, NSInteger index) {
@@ -350,7 +354,7 @@
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_FixedWH_FitWidth;
         alertConfiguration.coverBackgroundColor = [[UIColor whiteColor]colorWithAlphaComponent:0.5];
-        alertConfiguration.separatorPadding = 12;
+        alertConfiguration.separatorPadding = 5;
         
         alertConfiguration.confirmBackgroundColor = RGBA(0, 122, 255, 1);
         alertConfiguration.confirmTextColor = UIColor.whiteColor;
@@ -444,7 +448,7 @@
         FQ_AlertConfiguration * alertConfiguration = [[FQ_AlertConfiguration alloc]init];
         alertConfiguration.actionBtnTextType = FQ_AlertActionButtonTextType_FixedWH_FitWidth;
         alertConfiguration.coverBackgroundColor = [[UIColor whiteColor]colorWithAlphaComponent:0.5];
-        alertConfiguration.separatorPadding = 0.5;
+        alertConfiguration.separatorPadding = 1.0f;
         alertConfiguration.textContentBgColor = UIColor.whiteColor;
         alertConfiguration.alertContentViewBgColor = UIColor.lightGrayColor;
         alertConfiguration.hasAlertActionHorizontal = YES;

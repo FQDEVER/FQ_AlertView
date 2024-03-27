@@ -409,9 +409,10 @@ typedef enum : NSInteger{
  
  @param title 标题
  @param message 内容信息
+ @param actionStr 按钮内容
  @return AlertView
  */
-+ (instancetype)showTopAlertViewWithTitle:(NSString *)title message:(NSString *)message;
++ (instancetype)showTopAlertViewWithTitle:(NSString *)title message:(NSString *)message actionStr:(NSString *)actionStr;
 
 /**
  获取当前提示框的宽度
