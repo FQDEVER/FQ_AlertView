@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/cocoapods/l/FQ_AlertView.svg?style=flat)](http://cocoapods.org/pods/FQ_AlertView)
 [![Platform](https://img.shields.io/cocoapods/p/FQ_AlertView.svg?style=flat)](http://cocoapods.org/pods/FQ_AlertView)
 
-**效果图**(ps:没有效果图,怎么看的下去)
+**效果图**
 
  
 ![FQ_AlertTipView.gif](https://upload-images.jianshu.io/upload_images/2100495-fb54913b8d5bbb0d.gif?imageMogr2/auto-orient/strip)
